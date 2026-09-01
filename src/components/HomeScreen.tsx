@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { 
-  Upload, Shield, Zap, Lock, Database, Dna, ArrowRight, 
-  Sparkles, CheckCircle2, FileText, Trash2, Clock, Globe
+  Upload, Sparkles, FileText, Lock, Zap, Clock, Globe, 
+  ArrowRight, Trash2, Cpu, Compass, CheckCircle2, Binary, ChevronRight
 } from 'lucide-react';
 import { SAMPLE_DNA_KITS } from '../data/sampleDnaKits';
 import { DnaAnalysisResult } from '../types/haplogroup';
@@ -30,29 +30,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   progressMessage
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [pastedText, setPastedText] = useState('');
-  const [customKitName, setCustomKitName] = useState('Pasted Genotype Profile');
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setIsDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setIsDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      onFileUpload(e.dataTransfer.files[0]);
-    }
-  };
+  const [customKitName, setCustomKitName] = useState('My DNA Profile');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -63,250 +43,233 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handlePasteSubmit = () => {
     if (!pastedText.trim()) return;
-    onRawTextSubmit(pastedText, customKitName || 'Custom DNA Sample');
+    onRawTextSubmit(pastedText, customKitName || 'Custom Sample');
     setShowPasteModal(false);
     setPastedText('');
   };
 
   return (
-    <div className="min-h-[85vh] flex flex-col items-center justify-center py-10 px-4 sm:px-6 text-center animate-fade-up relative overflow-hidden">
+    <div className="max-w-7xl mx-auto space-y-8 animate-fade-up py-4 text-left">
       
-      {/* Background ambient lighting matching Genotype Scout */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-teal-500/10 via-emerald-500/5 to-indigo-500/10 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="max-w-4xl w-full relative z-10 space-y-8">
+      {/* Studio Top Control Strip (Replaces giant drag/drop) */}
+      <div className="bento-card p-6 sm:p-8 relative overflow-hidden">
         
-        {/* Curated Reference Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-teal-500/15 via-emerald-500/10 to-teal-500/15 text-teal-400 rounded-full text-[11px] font-black uppercase tracking-[0.2em] ring-1 ring-teal-500/30 shadow-sm">
-          <Database className="w-3.5 h-3.5 text-teal-400" />
-          <span>ISOGG &amp; PhyloTree Build 17 Engine Active</span>
-        </div>
+        {/* Subtle decorative glow */}
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Hero Title */}
-        <div className="space-y-4">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white leading-[1.1] text-gradient">
-            Trace Your Ancient Lineage <br />
-            <span className="text-gradient-teal">
-              100% Privately.
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-            Decode your paternal (Y-DNA) and maternal (mtDNA) haplogroups with deep DAG phylogenetic tree traversal, LD proxy imputation, and weighted transversion scoring <span className="text-white font-bold underline decoration-teal-400 decoration-2 underline-offset-4">entirely inside your browser</span>.
-          </p>
-        </div>
-
-        {/* Drag & Drop Zone */}
-        <div
-          onDragEnter={handleDrag}
-          onDragOver={handleDrag}
-          onDragLeave={handleDrag}
-          onDrop={handleDrop}
-          onClick={() => !isProcessing && fileInputRef.current?.click()}
-          className={`relative max-w-2xl mx-auto p-8 sm:p-12 rounded-[2.25rem] border-2 border-dashed cursor-pointer transition-all duration-300 overflow-hidden group ${
-            isDragActive 
-              ? 'border-teal-400 bg-teal-950/30 glow-teal scale-[1.02]' 
-              : 'border-slate-800 bg-[#121216]/80 backdrop-blur-xl hover:border-teal-500/70 hover:shadow-xl'
-          } ${isProcessing ? 'pointer-events-none opacity-80' : ''}`}
-        >
-          {/* Subtle Corner Brackets matching Genotype Scout */}
-          <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-teal-500/40 rounded-tl-sm pointer-events-none group-hover:border-teal-400 transition-colors" />
-          <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-teal-500/40 rounded-tr-sm pointer-events-none group-hover:border-teal-400 transition-colors" />
-          <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-teal-500/40 rounded-bl-sm pointer-events-none group-hover:border-teal-400 transition-colors" />
-          <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-teal-500/40 rounded-br-sm pointer-events-none group-hover:border-teal-400 transition-colors" />
-
-          {isProcessing ? (
-            <div className="space-y-4 py-6">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center animate-spin">
-                <Dna className="w-7 h-7 text-teal-400" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold text-white">{progressMessage}</h3>
-                <div className="w-64 max-w-full mx-auto bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
-                  <div 
-                    className="bg-gradient-to-r from-teal-500 to-emerald-400 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-                <span className="text-xs text-teal-400 font-mono font-bold">{progressPercent}%</span>
-              </div>
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+              <Compass className="w-3.5 h-3.5" />
+              <span>Phylogenetic Traversal Studio</span>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-4">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 ${
-                isDragActive 
-                  ? 'bg-teal-500 text-slate-950 rotate-12 scale-110 shadow-lg shadow-teal-500/40' 
-                  : 'bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/20 group-hover:scale-110'
-              }`}>
-                <Upload className="w-8 h-8" />
+            
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Haplotype <span className="text-gradient-cyan">Studio</span>
+            </h1>
+            
+            <p className="text-sm text-slate-300 leading-relaxed font-normal">
+              High-resolution Y-DNA &amp; mtDNA lineage mapping with DAG tree walking, 4.5x weighted transversions, and microhaplotype block phasing.
+            </p>
+          </div>
+
+          {/* Compact Upload & Ingest Actions */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            
+            {isProcessing ? (
+              <div className="flex items-center gap-3 px-6 py-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/40 text-xs">
+                <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shrink-0" />
+                <div className="space-y-0.5">
+                  <div className="font-bold text-white truncate max-w-[200px]">{progressMessage}</div>
+                  <div className="text-[10px] text-cyan-400 font-mono font-bold">{progressPercent}% complete</div>
+                </div>
               </div>
-              
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-2">
-                Drop your raw DNA file here
-              </h3>
-              
-              <p className="text-xs sm:text-sm text-slate-400 mb-6 max-w-sm">
-                Supports <strong className="text-teal-400 font-bold">.txt, .csv, or .zip</strong> from 23andMe, Ancestry, MyHeritage, FTDNA &amp; WGS
-              </p>
-              
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <span className="px-6 py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black rounded-full text-xs uppercase tracking-widest transition-all shadow-md active:scale-95 flex items-center gap-2">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Select File from Device</span>
-                </span>
+            ) : (
+              <>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-cyan-500/20 active:scale-95 cursor-pointer"
+                >
+                  <Upload className="w-4 h-4" />
+                  <span>Upload Raw DNA File</span>
+                </button>
 
                 <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowPasteModal(true);
-                  }}
-                  className="px-5 py-3 bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 font-bold rounded-full text-xs uppercase tracking-wider transition-all border border-white/[0.08] flex items-center gap-2"
+                  onClick={() => setShowPasteModal(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/60 font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-teal-400" />
+                  <FileText className="w-4 h-4 text-cyan-400" />
                   <span>Paste Snippet</span>
                 </button>
-              </div>
-            </div>
-          )}
+              </>
+            )}
 
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange}
-            accept=".txt,.csv,.tsv,.vcf,.zip"
-            className="hidden" 
-          />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".txt,.csv,.tsv,.vcf,.zip"
+              className="hidden"
+            />
+          </div>
+
         </div>
 
-        {/* Privacy & Science Guarantees */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-2 text-left">
-          <div className="premium-card p-5 space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
-              <Lock className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">100% Client-Side</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Files are processed entirely on your device via isolated Web Workers. Zero genomic data leaves your phone or computer.
-            </p>
+        {/* Feature Badges Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/[0.06] text-xs">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
+            <span className="font-medium">100% In-Browser Privacy</span>
           </div>
-
-          <div className="premium-card p-5 space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Zap className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">DAG Tree Traversal</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Navigates directed phylogenetic trees with ancestral guarding, homoplasy mitigation, and 4.5x weighted transversions.
-            </p>
+          <div className="flex items-center gap-2 text-slate-300">
+            <Zap className="w-4 h-4 text-indigo-400 shrink-0" />
+            <span className="font-medium">DAG Negative Guarding</span>
           </div>
-
-          <div className="premium-card p-5 space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <h4 className="text-sm font-bold text-white">LD Proxy Imputation</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Automatically rescues missing diagnostic markers from commercial microarrays using tight genomic proxies ($r^2 \ge 0.95$).
-            </p>
+          <div className="flex items-center gap-2 text-slate-300">
+            <Binary className="w-4 h-4 text-violet-400 shrink-0" />
+            <span className="font-medium">LD Proxy Imputation ($r^2 \ge 0.95$)</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-300">
+            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+            <span className="font-medium">Build 17 Transversions</span>
           </div>
         </div>
 
-        {/* Saved Profiles Section */}
-        {savedResults.length > 0 && (
-          <div className="pt-8 space-y-4 text-left">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-teal-400" />
-                <h3 className="text-base font-bold text-white">Saved Genomic Profiles</h3>
-              </div>
-              <span className="text-xs text-slate-400 font-mono">{savedResults.length} profile(s)</span>
+      </div>
+
+      {/* Main Studio 2-Column Bento Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Left Column: 1-Click Interactive Benchmark Kits (2-col span) */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-cyan-400" />
+              <h2 className="text-base font-bold text-white uppercase tracking-wider">Global Reference Cohorts</h2>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {savedResults.map((saved) => (
-                <div
-                  key={saved.id}
-                  onClick={() => onSelectSavedResult(saved)}
-                  className="premium-card-interactive p-4 cursor-pointer relative group flex flex-col justify-between"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-bold text-white truncate">{saved.kitName}</h4>
-                      <button
-                        onClick={(e) => onDeleteSavedResult(saved.id, e)}
-                        className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition-all opacity-0 group-hover:opacity-100"
-                        title="Delete Profile"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 text-xs font-mono">
-                      {saved.paternalLineage && (
-                        <span className="px-2 py-0.5 rounded-md bg-teal-950/60 border border-teal-700/50 text-teal-300 font-bold">
-                          Y: {saved.paternalLineage.terminalHaplogroup.code}
-                        </span>
-                      )}
-                      {saved.maternalLineage && (
-                        <span className="px-2 py-0.5 rounded-md bg-rose-950/60 border border-rose-700/50 text-rose-300 font-bold">
-                          mt: {saved.maternalLineage.terminalHaplogroup.code}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="text-[10px] text-slate-500 mt-3 pt-2 border-t border-white/[0.04] flex items-center justify-between">
-                    <span>{saved.totalSnpsParsed.toLocaleString()} SNPs</span>
-                    <span>{new Date(saved.timestamp).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <span className="text-xs text-slate-400 font-mono">1-Click Instant Analysis</span>
           </div>
-        )}
 
-        {/* 1-Click Interactive Reference Sample Kits */}
-        <div className="pt-8 space-y-4 text-left">
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-teal-400" />
-            <h3 className="text-base font-bold text-white">Global Reference Reference Profiles (1-Click Test)</h3>
-          </div>
-          <p className="text-xs text-slate-400">
-            Select a verified benchmark kit to explore ancient phylogenetic trajectories across global populations.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {SAMPLE_DNA_KITS.map((sample) => (
-              <button
+              <div
                 key={sample.id}
                 onClick={() => onSelectSampleKit(sample.id)}
-                className="premium-card-interactive p-4 text-left flex flex-col justify-between group"
+                className="bento-card-interactive p-4 cursor-pointer flex flex-col justify-between group"
               >
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-mono uppercase text-teal-400 font-bold tracking-wider">
-                    {sample.subtitle}
-                  </span>
-                  <h4 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
-                    {sample.title}
-                  </h4>
-                  <div className="flex gap-1.5 pt-1 text-[11px] font-mono">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-teal-400">
-                      {sample.paternalHaplo}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
+                      {sample.subtitle}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-rose-400">
-                      {sample.maternalHaplo}
-                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
                   </div>
+
+                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                    {sample.title}
+                  </h3>
+
+                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                    {sample.description}
+                  </p>
                 </div>
 
-                <div className="flex items-center text-xs text-teal-400 font-bold gap-1 mt-4 pt-2 border-t border-white/[0.04]">
-                  <span>Analyze Kit</span>
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center gap-2 pt-3 mt-3 border-t border-white/[0.04] text-[11px] font-mono">
+                  <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-300 font-bold">
+                    Y: {sample.paternalHaplo}
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-rose-300 font-bold">
+                    mt: {sample.maternalHaplo}
+                  </span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
+        </div>
+
+        {/* Right Column: Saved Profiles & Engine Telemetry */}
+        <div className="space-y-6">
+          
+          {/* Saved Profiles */}
+          <div className="bento-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-cyan-400" />
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider">Local Profiles</h2>
+              </div>
+              <span className="text-[11px] text-slate-400 font-mono">{savedResults.length} saved</span>
+            </div>
+
+            {savedResults.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-500 space-y-1">
+                <p>No analyzed kits saved yet.</p>
+                <p className="text-[10px]">Upload a file or pick a benchmark kit above.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                {savedResults.map((saved) => (
+                  <div
+                    key={saved.id}
+                    onClick={() => onSelectSavedResult(saved)}
+                    className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-cyan-500/50 cursor-pointer group flex items-center justify-between transition-all"
+                  >
+                    <div className="space-y-1 min-w-0 pr-2">
+                      <h4 className="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">
+                        {saved.kitName}
+                      </h4>
+                      <div className="flex gap-1.5 text-[10px] font-mono">
+                        {saved.paternalLineage && (
+                          <span className="text-cyan-400">{saved.paternalLineage.terminalHaplogroup.code}</span>
+                        )}
+                        {saved.paternalLineage && saved.maternalLineage && <span className="text-slate-600">/</span>}
+                        {saved.maternalLineage && (
+                          <span className="text-rose-400">{saved.maternalLineage.terminalHaplogroup.code}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={(e) => onDeleteSavedResult(saved.id, e)}
+                      className="p-1.5 rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-950/40 transition-all opacity-0 group-hover:opacity-100"
+                      title="Delete profile"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Engine Specs */}
+          <div className="bento-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-indigo-400" />
+              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Engine Specs</h3>
+            </div>
+            
+            <div className="space-y-2 text-xs text-slate-300">
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-slate-400">Y-Tree Architecture:</span>
+                <span className="font-mono text-cyan-300">ISOGG DAG Radix</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-slate-400">mtDNA Reference:</span>
+                <span className="font-mono text-cyan-300">PhyloTree Build 17</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-slate-400">Imputation Linkage:</span>
+                <span className="font-mono text-cyan-300">$r^2 \ge 0.95$ Proxies</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-slate-400">Worker Isolation:</span>
+                <span className="font-mono text-emerald-400">Dedicated Thread</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -314,10 +277,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Raw Snippet Paste Modal */}
       {showPasteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="premium-card max-w-xl w-full p-6 text-left space-y-4 border border-teal-500/30">
-            <h3 className="text-lg font-bold text-white">Paste Raw Genotype Snippet</h3>
+          <div className="bento-card max-w-lg w-full p-6 text-left space-y-4 border border-cyan-500/40">
+            <h3 className="text-base font-bold text-white">Paste Raw Genotype Snippet</h3>
             <p className="text-xs text-slate-400">
-              Paste rsIDs and allele calls from your 23andMe, Ancestry, or VCF file to test instant in-browser classification.
+              Paste SNP markers with rsIDs or coordinates to execute instant in-browser classification.
             </p>
 
             <div className="space-y-2">
@@ -326,7 +289,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 type="text"
                 value={customKitName}
                 onChange={(e) => setCustomKitName(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-teal-500 font-mono"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
               />
             </div>
 
@@ -337,7 +300,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 onChange={(e) => setPastedText(e.target.value)}
                 rows={8}
                 placeholder={"rs9786184\tY\t18515000\tTT\nrs28358280\tMT\t7028\tCC\n..."}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-teal-300 focus:outline-none focus:border-teal-500 font-mono"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono"
               />
             </div>
 
@@ -351,9 +314,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <button
                 onClick={handlePasteSubmit}
                 disabled={!pastedText.trim()}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-teal-500 text-slate-950 hover:bg-teal-400 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
               >
-                Parse &amp; Analyze
+                Run Classification
               </button>
             </div>
           </div>
