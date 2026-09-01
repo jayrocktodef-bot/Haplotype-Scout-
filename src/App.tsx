@@ -4,9 +4,11 @@ import { HomeScreen } from './components/HomeScreen';
 import { AnalysisResultScreen } from './components/AnalysisResultScreen';
 import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
+import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
 import { SAMPLE_DNA_KITS } from './data/sampleDnaKits';
+import { Heart, ExternalLink, GitBranch, Sparkles, BookOpen, ShieldCheck, Dna } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
@@ -15,6 +17,7 @@ export const App: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingMessage, setProcessingMessage] = useState('');
+  const [showDonationModal, setShowDonationModal] = useState(false);
 
   // Load saved kit results from IndexedDB on startup
   useEffect(() => {
@@ -108,11 +111,12 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#09090b] text-slate-100 flex flex-col selection:bg-teal-500/30 selection:text-teal-200">
       
-      {/* Top Header Navigation matching Genotype Scout */}
+      {/* Top Header Navigation */}
       <Navigation
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
         hasActiveResult={activeResult !== null}
+        onOpenDonation={() => setShowDonationModal(true)}
       />
 
       {/* Main Content Area */}
@@ -150,12 +154,121 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/[0.08] py-8 text-center text-xs text-slate-500 bg-[#09090b]/80 backdrop-blur-md">
-        <p className="max-w-2xl mx-auto px-4">
-          <strong>Haplotype Scout PWA</strong> • SOTA In-Browser Phylogenetic Exploration • Written In The Genome
-        </p>
+      {/* Rich Footer with Branding & Ecosystem Links */}
+      <footer className="border-t border-white/[0.08] py-12 px-4 sm:px-6 bg-[#09090b]/90 backdrop-blur-xl mt-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
+          
+          {/* Brand Col */}
+          <div className="space-y-3 md:col-span-2">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp"
+                alt="Written In The Genome"
+                className="w-7 h-7 rounded-lg ring-1 ring-teal-500/30 object-cover"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+              />
+              <span className="text-base font-black text-white">Written In The Genome</span>
+            </div>
+            <p className="text-xs text-slate-400 max-w-md leading-relaxed">
+              Pioneering private, client-side bioinformatics tools and publishing independent genomic research exploring ancient DNA, population genetics, and human history.
+            </p>
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                onClick={() => setShowDonationModal(true)}
+                className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 to-rose-500/15 text-amber-300 hover:from-amber-500/25 hover:to-rose-500/25 border border-amber-500/30 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+                <span>Support Our Research</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Research & Publications */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Publications &amp; Dispatches</h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <a
+                  href="https://writteninthegenome.blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Main Blog Home</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://writteninthegenome.blog/dispatches-archives/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Dispatches Archive</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://writteninthegenome.blog/sources-research-library/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Sources &amp; Research Library</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Ecosystem Projects */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Genomic Ecosystem</h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <a
+                  href="https://github.com/jayrocktodef-bot/WITG-Genotype-Scout"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Genotype Scout</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/jayrocktodef-bot/Haplotype-Scout-"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Haplotype Scout Repository</span>
+                  <GitBranch className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li className="pt-1">
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" /> 100% Offline &amp; Private
+                </span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="pt-6 border-t border-white/[0.06] text-center text-xs text-slate-500">
+          <p>© {new Date().getFullYear()} Written In The Genome. All rights reserved.</p>
+        </div>
       </footer>
+
+      {/* Donation & Support Modal */}
+      <DonationModal
+        isOpen={showDonationModal}
+        onClose={() => setShowDonationModal(false)}
+      />
 
     </div>
   );
