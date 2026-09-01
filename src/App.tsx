@@ -6,6 +6,8 @@ import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
 import { PhylogeneticTreeViewer } from './components/PhylogeneticTreeViewer';
 import { AncientSampleMatcher } from './components/AncientSampleMatcher';
+import { PaleoMigrationMap } from './components/PaleoMigrationMap';
+import { ArchaicAndPhasedScreen } from './components/ArchaicAndPhasedScreen';
 import { BetaNoticeModal } from './components/BetaNoticeModal';
 import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
@@ -195,10 +197,38 @@ export const App: React.FC = () => {
           />
         )}
 
+        {currentTab === 'map' && activeResult && (
+          <div className="max-w-6xl mx-auto space-y-6">
+            <PaleoMigrationMap
+              migrationSteps={
+                activeResult.paternalLineage?.terminalHaplogroup.migrationPath ||
+                activeResult.maternalLineage?.terminalHaplogroup.migrationPath ||
+                []
+              }
+              cladeCode={
+                activeResult.paternalLineage?.terminalHaplogroup.code ||
+                activeResult.maternalLineage?.terminalHaplogroup.code ||
+                'Global'
+              }
+              lineageLabel={
+                activeResult.paternalLineage ? 'Paternal Y-DNA' : 'Maternal mtDNA'
+              }
+            />
+          </div>
+        )}
+
         {currentTab === 'ancient' && (
           <AncientSampleMatcher
             paternalHaplo={activeResult?.paternalLineage?.terminalHaplogroup}
             maternalHaplo={activeResult?.maternalLineage?.terminalHaplogroup}
+          />
+        )}
+
+        {currentTab === 'archaic' && (
+          <ArchaicAndPhasedScreen
+            archaicResult={activeResult?.archaicAffinity}
+            microhaplotypes={activeResult?.microhaplotypes}
+            onExploreTree={() => setCurrentTab('tree')}
           />
         )}
 

@@ -4,10 +4,8 @@ import {
   MapPin, Clock, Users, ArrowRight, Compass, Filter
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
-import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
 import { TmrcaClockCard } from './TmrcaClockCard';
 import { BranchSpineAuditCard } from './BranchSpineAuditCard';
-import { PaleoMigrationMap } from './PaleoMigrationMap';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -257,13 +255,6 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             </div>
           </div>
 
-          {/* Paleogeographic Steppe & Clan Migration Map */}
-          <PaleoMigrationMap
-            migrationSteps={currentAnalysis.terminalHaplogroup.migrationPath}
-            cladeCode={currentAnalysis.terminalHaplogroup.code}
-            lineageLabel={activeLineage === 'PATERNAL_YDNA' ? 'Paternal Y-DNA' : 'Maternal mtDNA'}
-          />
-
           {/* Phylogenetic Branch Mutation Ladder Audit & Private Variant Caller */}
           <BranchSpineAuditCard
             lineagePath={currentAnalysis.lineageTreePath}
@@ -380,43 +371,6 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
           <p className="text-sm text-slate-400">
             No diagnostic markers available for this lineage type in the uploaded raw DNA file.
           </p>
-        </div>
-      )}
-
-      {/* Archaic DNA Introgression & Hominin Affinity Bento Card */}
-      {result.archaicAffinity && (
-        <ArchaicIntrogressionCard archaicData={result.archaicAffinity} />
-      )}
-
-      {/* Microhaplotype Phased Ancestry Bento Card */}
-      {result.microhaplotypes && result.microhaplotypes.length > 0 && (
-        <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Microhaplotype Phased Affinity
-              </h3>
-            </div>
-            <span className="text-xs text-slate-400 font-mono">100-Block Phased Kernel</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {result.microhaplotypes.map((hap) => (
-              <div key={hap.popCode} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-200">{hap.name}</span>
-                  <span className="font-mono font-bold text-cyan-300">{hap.percentage}%</span>
-                </div>
-                <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
-                  <div 
-                    className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full"
-                    style={{ width: `${hap.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 
