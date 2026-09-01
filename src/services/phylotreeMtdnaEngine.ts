@@ -1,9 +1,12 @@
+import { LineageAnalysis } from '../types/haplogroup';
+
 export interface PhylotreeMutation {
   position: number;
   ancestral: string;
   derived: string;
   rawString: string;
   isTransversion: boolean;
+  isHotspot: boolean;
   weight: number;
 }
 
@@ -11,6 +14,11 @@ export interface PhylotreeBranch {
   branchName: string;
   mutations: string[];
 }
+
+// Known hypervariable & homoplastic mutational hotspots (HaploGrep 2 / 3 consensus)
+export const MTDNA_MUTATION_HOTSPOTS = new Set<number>([
+  146, 152, 195, 309, 315, 524, 525, 16182, 16183, 16189, 16311, 16519
+]);
 
 /**
  * Parses mutation string like "G263A", "C1048T", "A263G!", "315.1C", "524-525d"
@@ -29,26 +37,37 @@ export function parseMtMutation(raw: string): PhylotreeMutation | null {
     const isTransition = (ancestral === 'A' && derived === 'G') || (ancestral === 'G' && derived === 'A') ||
                          (ancestral === 'C' && derived === 'T') || (ancestral === 'T' && derived === 'C');
 
+    const isHotspot = MTDNA_MUTATION_HOTSPOTS.has(pos);
+
+    let weight = isTransition ? 1.0 : 4.5;
+    if (isHotspot) {
+      weight *= 0.35; // Dampen hypervariable mutational hotspots
+    }
+
     return {
       position: pos,
       ancestral,
       derived,
       rawString: raw,
       isTransversion: !isTransition,
-      weight: isTransition ? 1.0 : 4.5
+      isHotspot,
+      weight
     };
   }
 
   // Fallback for indels / deletions (e.g. 524d)
   const indelMatch = clean.match(/^(\d+)/);
   if (indelMatch) {
+    const pos = parseInt(indelMatch[1], 10);
+    const isHotspot = MTDNA_MUTATION_HOTSPOTS.has(pos);
     return {
-      position: parseInt(indelMatch[1], 10),
+      position: pos,
       ancestral: '-',
       derived: '+',
       rawString: raw,
       isTransversion: true,
-      weight: 3.0
+      isHotspot,
+      weight: isHotspot ? 0.8 : 2.5
     };
   }
 
@@ -66,7 +85,7 @@ export interface MtDnaMatchScore {
 
 /**
  * Evaluates user's mtDNA mutations against Van Oven PhyloTree Build 17
- * Applies 4.5x weight to transversions and penalizes mismatch deviations.
+ * Applies 4.5x weight to transversions, dampens hotspots, and penalizes ancestral clashes.
  */
 export function matchPhyloTreeBuild17(
   userPosMap: Record<number, string>, // pos -> userGenotype
@@ -99,7 +118,7 @@ export function matchPhyloTreeBuild17(
         }
       } else if (u.includes(parsed.ancestral)) {
         // Ancestral observation: slight negative pressure for deeply nested branches
-        score -= 0.5;
+        score -= parsed.isHotspot ? 0.2 : 0.6;
       }
     }
 
@@ -116,4 +135,41 @@ export function matchPhyloTreeBuild17(
   }
 
   return results.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Dynamically refines maternal lineage if Build 17 discovers a deeper confirmed sub-branch
+ */
+export function refineMtdnaWithBuild17(
+  currentLineage: LineageAnalysis,
+  deepMatches: MtDnaMatchScore[]
+): LineageAnalysis {
+  if (!deepMatches || deepMatches.length === 0 || !currentLineage.terminalHaplogroup) {
+    return currentLineage;
+  }
+
+  const top = deepMatches[0];
+  const currentCode = currentLineage.terminalHaplogroup.code;
+
+  // Check if the top deep match is a descendant or refinement of the current root clade
+  const isDescendant = top.branchName.startsWith(currentCode) || 
+                       (currentCode === 'N' && top.branchName.startsWith('W')) ||
+                       (currentCode === 'R' && (top.branchName.startsWith('H') || top.branchName.startsWith('V') || top.branchName.startsWith('U')));
+
+  if (isDescendant && top.score >= 1.5 && top.matchedCount >= 1) {
+    const existingNovel = currentLineage.novelOrUntestedMarkers || [];
+    return {
+      ...currentLineage,
+      terminalHaplogroup: {
+        ...currentLineage.terminalHaplogroup,
+        code: top.branchName,
+        shortName: `Haplogroup ${top.branchName}`,
+        cladeName: `mtDNA-${top.branchName}`,
+      },
+      confidenceScore: Math.min(0.99, currentLineage.confidenceScore + 0.05),
+      novelOrUntestedMarkers: Array.from(new Set([...existingNovel, ...top.matchedMutations]))
+    };
+  }
+
+  return currentLineage;
 }

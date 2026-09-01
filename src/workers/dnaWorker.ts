@@ -74,7 +74,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       const mtResponse = await fetch('/data/master_mtdna.json');
       if (mtResponse.ok) {
         const mtData = await mtResponse.json();
-        const { matchPhyloTreeBuild17 } = await import('../services/phylotreeMtdnaEngine');
+        const { matchPhyloTreeBuild17, refineMtdnaWithBuild17 } = await import('../services/phylotreeMtdnaEngine');
         
         // Extract numeric mtDNA positions from parsedData
         const mtPosMap: Record<number, string> = {};
@@ -87,12 +87,12 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
 
         const deepMtMatches = matchPhyloTreeBuild17(mtPosMap, mtData.haplogroups);
         if (deepMtMatches.length > 0 && result.maternalLineage) {
-          const topMatch = deepMtMatches[0];
-          // If deep match matches or refines current assignment, incorporate top mutations
-          if (topMatch.score > 2.0 && topMatch.matchedCount >= 1) {
-            result.maternalLineage.novelOrUntestedMarkers = topMatch.matchedMutations;
-          }
+          result.maternalLineage = refineMtdnaWithBuild17(result.maternalLineage, deepMtMatches);
         }
+
+        // Run EMPOP Forensic QC & Indel Standardization
+        const { runEmpopForensicQc } = await import('../services/empopForensicEngine');
+        result.empopQcReport = runEmpopForensicQc(mtPosMap);
       }
     } catch (e) {
       console.warn('Deep mtDNA Build 17 resolution skipped:', e);

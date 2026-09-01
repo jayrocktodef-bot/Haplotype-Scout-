@@ -91,6 +91,8 @@ export interface ArchaicAffinityResult {
   functionalLoci: ArchaicLocusMatch[];
 }
 
+import { EmpopForensicQcReport } from '../services/empopForensicEngine';
+
 export interface DnaAnalysisResult {
   id: string;
   kitName: string;
@@ -103,6 +105,7 @@ export interface DnaAnalysisResult {
   maternalLineage: LineageAnalysis | null;
   microhaplotypes?: MicroHapResult[];
   archaicAffinity?: ArchaicAffinityResult;
+  empopQcReport?: EmpopForensicQcReport;
   isMaleSample: boolean;
 }
 

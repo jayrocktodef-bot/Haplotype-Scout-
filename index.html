@@ -131,5 +131,27 @@
   <body class="bg-[#080c14] text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden min-h-screen">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Jetpack Stats Integration (Written In The Genome Blog ID: 182120512) -->
+    <script id="jetpack-stats-js-before">
+      window._stq = window._stq || [];
+      window._stq.push([
+        "view",
+        {
+          v: "ext",
+          blog: "182120512",
+          post: "0",
+          tz: "-4",
+          srv: "haplotype.writteninthegenome.blog",
+          hp: "atomic",
+          ac: "2",
+          amp: "0",
+          sub: "haplotype-scout"
+        }
+      ]);
+      window._stq.push(["extra", { host: "haplotype.writteninthegenome.blog" }]);
+    </script>
+    <script defer fetchpriority="low" id="jetpack-stats-js" src="https://stats.wp.com/e-202629.js"></script>
   </body>
 </html>
+

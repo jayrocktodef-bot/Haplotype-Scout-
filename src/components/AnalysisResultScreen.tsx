@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { 
   Dna, Sparkles, CheckCircle2, MinusCircle, HelpCircle, XCircle, 
-  MapPin, Clock, Users, ArrowRight, Compass, Filter
+  MapPin, Clock, Users, ArrowRight, Compass, Filter, ShieldCheck, Globe, Landmark
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { TmrcaClockCard } from './TmrcaClockCard';
 import { BranchSpineAuditCard } from './BranchSpineAuditCard';
+import { PatrilinealGenealogyCard } from './PatrilinealGenealogyCard';
+import { getHmitoPhylogeographicDossier } from '../services/hmitoGeoEngine';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -262,6 +264,150 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             lineageType={activeLineage}
             novelOrUntestedMarkers={currentAnalysis.novelOrUntestedMarkers}
           />
+
+          {/* 📜 Patrilineal Surname & Y-STR Forensic Guide (Paternal Y-DNA Only) */}
+          {activeLineage === 'PATERNAL_YDNA' && (
+            <PatrilinealGenealogyCard terminalClade={currentAnalysis.terminalHaplogroup} />
+          )}
+
+          {/* 🔬 EMPOP Forensic QC & SAM Alignment Audit Card (Maternal mtDNA Only) */}
+          {activeLineage === 'MATERNAL_MTDNA' && result.empopQcReport && (
+            <div className="bento-card p-6 sm:p-7 space-y-4 text-left border border-cyan-500/20 bg-slate-900/70">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-extrabold text-white">
+                        EMPOP Forensic QC &amp; SAM Alignment Audit
+                      </h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-bold uppercase">
+                        Parson &amp; Dür 2007 Standard
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Forensic quality control filter assessing "Phantom Mutations", poly-C stutters, and SAM 3'-indel alignments.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded-xl text-xs font-bold font-mono border ${
+                    result.empopQcReport.overallStatus === 'PASSED_FORENSIC_STANDARDS'
+                      ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30'
+                      : 'bg-amber-950/80 text-amber-300 border-amber-500/30'
+                  }`}>
+                    {result.empopQcReport.overallStatus === 'PASSED_FORENSIC_STANDARDS' ? '✓ Passed Forensic QC' : '⚠️ Flagged Chip Artifacts'} ({result.empopQcReport.forensicCoherenceScorePct}%)
+                  </span>
+                </div>
+              </div>
+
+              {/* Alignment & Artifact Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/[0.04] space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 font-bold">
+                    SAM 3'-Indel Normalization
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    {result.empopQcReport.samAlignmentNotes.length > 0
+                      ? result.empopQcReport.samAlignmentNotes.join(' • ')
+                      : 'All detected insertions and deletions conform to standard rCRS 3\'-alignment.'}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/[0.04] space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase text-slate-400 font-bold">
+                    Phantom Mutation &amp; Dye-Shift Audit
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    {result.empopQcReport.flaggedArtifacts.length === 0
+                      ? 'Zero artificial BeadChip dye-shifts or synthetic reticulations detected.'
+                      : `${result.empopQcReport.flaggedArtifacts.length} suspected microarray probe artifacts flagged and dampened.`}
+                  </p>
+                </div>
+              </div>
+
+              {result.empopQcReport.flaggedArtifacts.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/20 space-y-2 text-xs">
+                  <div className="font-bold text-amber-300 text-[11px] uppercase tracking-wide">
+                    Flagged Microarray Loci Details:
+                  </div>
+                  {result.empopQcReport.flaggedArtifacts.map((art, idx) => (
+                    <div key={idx} className="text-[11px] text-slate-300 space-y-0.5 border-l-2 border-amber-500/50 pl-2">
+                      <span className="font-mono font-bold text-amber-200">Position {art.position} ({art.observedGenotype})</span>: {art.explanation}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 🌍 hMITO DB Phylogeographic Homeland Dossier (Maternal mtDNA Only) */}
+          {activeLineage === 'MATERNAL_MTDNA' && (
+            (() => {
+              const dossier = getHmitoPhylogeographicDossier(currentAnalysis.terminalHaplogroup.code);
+              return (
+                <div className="bento-card p-6 sm:p-7 space-y-5 text-left relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-300">
+                        <Globe className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-extrabold text-white">
+                            hMITO DB Phylogeographic Homeland Dossier
+                          </h3>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 font-bold uppercase">
+                            Shen-Gunther et al. 2023
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Biogeographic origin matrix, migration horizon, and historical archaeological correlations for {dossier.haplogroup}.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-xs font-mono font-bold text-indigo-300 px-3 py-1 rounded-xl bg-indigo-950/80 border border-indigo-500/30">
+                        {dossier.continentalHomeland}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div className="p-4 rounded-xl bg-slate-950/60 border border-white/[0.04] space-y-2">
+                      <div className="flex items-center gap-2 text-indigo-300 font-bold uppercase tracking-wider text-[11px]">
+                        <Landmark className="w-3.5 h-3.5" />
+                        <span>Biogeographic &amp; Cultural Horizon</span>
+                      </div>
+                      <div className="space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
+                        <div><strong className="text-white">Sub-Region:</strong> {dossier.subRegionalBiogeography}</div>
+                        <div><strong className="text-white">Migration Horizon:</strong> {dossier.historicalMigrationEpoch}</div>
+                        <div><strong className="text-white">Paleoclimatic Context:</strong> {dossier.paleoclimaticContext}</div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-950/60 border border-white/[0.04] space-y-2">
+                      <div className="flex items-center gap-2 text-purple-300 font-bold uppercase tracking-wider text-[11px]">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>Primary Historical &amp; Modern Populations</span>
+                      </div>
+                      <div className="space-y-1.5 text-slate-300 text-[11px] leading-relaxed">
+                        <div><strong className="text-white">Ancient Peoples:</strong> {dossier.primaryHistoricalPopulations.join(', ')}</div>
+                        <div><strong className="text-white">Modern Distribution:</strong> {dossier.modernDistributionHotspots.join(', ')}</div>
+                        <div><strong className="text-white">Archaeology:</strong> {dossier.archeologicalCorrelation}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          )}
 
           {/* Diagnostic Marker Inspector */}
           <div className="bento-card p-6 space-y-4">

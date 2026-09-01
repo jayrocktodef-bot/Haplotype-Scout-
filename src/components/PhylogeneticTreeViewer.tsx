@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Y_DNA_HAPLOGROUPS, MT_DNA_HAPLOGROUPS } from '../data/haplogroupTree';
 import { HaplogroupDefinition, DnaAnalysisResult } from '../types/haplogroup';
 import {
@@ -16,7 +16,9 @@ import {
   Share2,
   Search,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  Target,
+  X
 } from 'lucide-react';
 
 interface TreeNode {
@@ -39,10 +41,11 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
   );
   const [selectedNode, setSelectedNode] = useState<HaplogroupDefinition | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 100, y: 150 });
+  const [zoom, setZoom] = useState(0.85);
+  const [pan, setPan] = useState({ x: 60, y: 120 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [touchDistance, setTouchDistance] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -56,8 +59,8 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
     }
   }, [activeResult, activeLineage]);
 
-  // Build the hierarchical tree structure
-  const { rootNode, nodeMap, userPathCodes } = useMemo(() => {
+  // Build the hierarchical tree structure (Supports multiple roots / full reachability)
+  const { rootNodes, nodeMap, userPathCodes } = useMemo(() => {
     const rawList = activeLineage === 'PATERNAL_YDNA' ? Y_DNA_HAPLOGROUPS : MT_DNA_HAPLOGROUPS;
     const map = new Map<string, TreeNode>();
 
@@ -66,16 +69,16 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
       map.set(hg.code, { data: hg, children: [], depth: 0 });
     }
 
-    let root: TreeNode | null = null;
+    const roots: TreeNode[] = [];
 
-    // 2. Link Children & determine Root
+    // 2. Link Children & determine Roots
     for (const hg of rawList) {
       const node = map.get(hg.code)!;
       if (hg.parentClade && map.has(hg.parentClade)) {
         const parent = map.get(hg.parentClade)!;
         parent.children.push(node);
       } else {
-        root = node;
+        roots.push(node);
       }
     }
 
@@ -86,7 +89,9 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
         setDepth(child, d + 1);
       }
     };
-    if (root) setDepth(root, 0);
+    for (const r of roots) {
+      setDepth(r, 0);
+    }
 
     // 4. Trace User Lineage Path from Terminal Clade up to Root
     const pathCodes = new Set<string>();
@@ -102,11 +107,12 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
       }
     }
 
-    return { rootNode: root, nodeMap: map, userPathCodes: pathCodes };
+    return { rootNodes: roots, nodeMap: map, userPathCodes: pathCodes };
   }, [activeLineage, userHaplogroupCode]);
 
-  // Handle Drag / Pan Events
+  // Mouse drag handling
   const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, input, .node-element')) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
@@ -123,22 +129,59 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
     setIsDragging(false);
   };
 
+  // Mobile Touch Pan & Pinch Zoom Handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+    } else if (e.touches.length === 2) {
+      setIsDragging(false);
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      setTouchDistance(dist);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length === 1) {
+      setPan({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y
+      });
+    } else if (e.touches.length === 2 && touchDistance !== null) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = dist / touchDistance;
+      setZoom((z) => Math.min(2.5, Math.max(0.25, z * factor)));
+      setTouchDistance(dist);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setTouchDistance(null);
+  };
+
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-    setZoom((prev) => Math.min(2.5, Math.max(0.3, prev * zoomFactor)));
+    setZoom((prev) => Math.min(2.5, Math.max(0.25, prev * zoomFactor)));
   };
 
   const resetView = () => {
-    setZoom(1);
-    setPan({ x: 100, y: 150 });
+    setZoom(0.85);
+    setPan({ x: 60, y: 120 });
   };
 
   // Layout node coordinates (Tree coordinates calculation)
   const renderTree = useMemo(() => {
-    if (!rootNode) return null;
+    if (rootNodes.length === 0) return null;
 
-    let currentY = 50;
+    let currentY = 60;
     const X_SPACING = 240;
     const Y_SPACING = 65;
 
@@ -165,7 +208,10 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
       }
     };
 
-    computePositions(rootNode);
+    for (const root of rootNodes) {
+      computePositions(root);
+      currentY += 40; // Spacing between multiple roots
+    }
 
     // Filter nodes if search query is active
     const searchMatches = new Set<string>();
@@ -208,9 +254,8 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
             fill="none"
             stroke={isChildInUserPath ? '#06b6d4' : '#334155'}
             strokeWidth={isChildInUserPath ? 3.5 : 1.5}
-            strokeDasharray={isChildInUserPath ? 'none' : 'none'}
             className="transition-all duration-300"
-            opacity={searchQuery && !searchMatches.has(child.data.code) && !isMatch ? 0.3 : 1}
+            opacity={searchQuery && !searchMatches.has(child.data.code) && !isMatch ? 0.25 : 1}
           />
         );
 
@@ -221,7 +266,7 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
         <g
           key={`node-${node.data.code}`}
           transform={`translate(${parentPos.x}, ${parentPos.y})`}
-          className="cursor-pointer group"
+          className="cursor-pointer group node-element"
           onClick={(e) => {
             e.stopPropagation();
             setSelectedNode(node.data);
@@ -271,7 +316,7 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
             {node.data.code}
           </text>
 
-          {/* Defining SNP pill under label */}
+          {/* Defining SNP text under label */}
           <text
             x={16}
             y={18}
@@ -283,39 +328,64 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
       );
     };
 
-    drawSubtree(rootNode);
+    for (const root of rootNodes) {
+      drawSubtree(root);
+    }
 
-    return { lines, nodes, height: currentY + 100, width: (rootNode.depth + 10) * X_SPACING + 400 };
-  }, [rootNode, userPathCodes, userHaplogroupCode, searchQuery, selectedNode, nodeMap]);
+    return { lines, nodes, positions, totalHeight: currentY };
+  }, [rootNodes, nodeMap, userPathCodes, userHaplogroupCode, searchQuery, selectedNode]);
+
+  // Center / Focus View on User's Terminal Clade
+  const focusOnUserClade = useCallback(() => {
+    if (!userHaplogroupCode || !renderTree?.positions) return;
+    const pos = renderTree.positions.get(userHaplogroupCode);
+    if (!pos || !containerRef.current) return;
+
+    const width = containerRef.current.clientWidth;
+    const height = containerRef.current.clientHeight;
+
+    const targetZoom = 1.1;
+    setZoom(targetZoom);
+    setPan({
+      x: width / 2 - pos.x * targetZoom,
+      y: height / 2 - pos.y * targetZoom
+    });
+
+    const node = nodeMap.get(userHaplogroupCode)?.data;
+    if (node) setSelectedNode(node);
+  }, [userHaplogroupCode, renderTree, nodeMap]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full rounded-2xl bg-[#080c14] border border-white/[0.08] overflow-hidden flex flex-col ${
-        isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen' : 'h-[750px]'
+      className={`relative w-full rounded-2xl bg-[#080c14] border border-white/[0.08] shadow-2xl overflow-hidden flex flex-col transition-all duration-300 text-left ${
+        isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen' : 'h-[750px] max-h-[85vh]'
       }`}
     >
       {/* Studio Header Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 border-b border-white/[0.08] bg-[#0d1424]/90 backdrop-blur-xl z-20">
+      <div className="p-4 sm:p-5 border-b border-white/[0.08] bg-[#0c1220]/90 backdrop-blur-xl flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
+        
+        {/* Left Title */}
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
             <Compass className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
               <span>Interactive Phylogenetic Tree</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 uppercase font-mono">
-                ISOGG &amp; PhyloTree 17
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 uppercase font-mono hidden sm:inline">
+                ISOGG v15 &amp; PhyloTree 17
               </span>
             </h3>
             <p className="text-xs text-slate-400">
-              Interactive global tree with live path tracing from Root to Terminal Clade.
+              Complete {activeLineage === 'PATERNAL_YDNA' ? '55 Y-DNA' : '48 mtDNA'} clade hierarchy with root-to-terminal path highlighting.
             </p>
           </div>
         </div>
 
-        {/* Tree Selector & Search */}
-        <div className="flex items-center gap-3">
+        {/* Center & Right Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          
           {/* Y-DNA vs mtDNA Toggle */}
           <div className="flex rounded-xl bg-slate-900/90 border border-white/[0.08] p-1">
             <button
@@ -323,7 +393,7 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
                 setActiveLineage('PATERNAL_YDNA');
                 setSelectedNode(null);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeLineage === 'PATERNAL_YDNA'
                   ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
@@ -336,7 +406,7 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
                 setActiveLineage('MATERNAL_MTDNA');
                 setSelectedNode(null);
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeLineage === 'MATERNAL_MTDNA'
                   ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
@@ -354,54 +424,70 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search SNP or Clade..."
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-900 border border-white/[0.08] text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 w-44"
+              className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-900 border border-white/[0.08] text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 w-36 sm:w-44"
             />
           </div>
 
-          {/* Zoom & Fullscreen Controls */}
+          {/* User Clade Focus Target Button */}
+          {userHaplogroupCode && (
+            <button
+              onClick={focusOnUserClade}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition-all cursor-pointer"
+              title={`Center on your clade (${userHaplogroupCode})`}
+            >
+              <Target className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Focus Clade</span>
+            </button>
+          )}
+
+          {/* Zoom & View Controls */}
           <div className="flex items-center gap-1 bg-slate-900/90 border border-white/[0.08] p-1 rounded-xl">
             <button
               onClick={() => setZoom((z) => Math.min(2.5, z * 1.2))}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setZoom((z) => Math.max(0.3, z * 0.8))}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              onClick={() => setZoom((z) => Math.max(0.25, z * 0.8))}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <button
               onClick={resetView}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               title="Reset View"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* SVG Canvas Area */}
+      {/* SVG Interactive Canvas Area */}
       <div
-        className="flex-1 w-full h-full relative cursor-grab active:cursor-grabbing bg-[#080c14] select-none"
+        className="flex-1 w-full h-full relative cursor-grab active:cursor-grabbing bg-[#080c14] select-none touch-none overflow-hidden"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
       >
-        {/* Subtle Canvas Grid Lines */}
+        {/* Subtle Canvas Grid Pattern */}
         <div
           className="absolute inset-0 pointer-events-none opacity-20"
           style={{
@@ -413,16 +499,16 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
 
         {/* User Lineage Banner if active */}
         {userHaplogroupCode && (
-          <div className="absolute top-4 left-4 z-10 p-3 rounded-xl bg-cyan-950/80 border border-cyan-500/30 backdrop-blur-md flex items-center gap-3">
+          <div className="absolute top-4 left-4 z-10 p-3 rounded-xl bg-[#0c1220]/90 border border-cyan-500/30 backdrop-blur-md flex items-center gap-3 shadow-lg">
             <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
             <div>
               <div className="text-[10px] text-cyan-300 uppercase tracking-wider font-bold">
-                Your Sample Path
+                Your Assigned Lineage
               </div>
               <div className="text-xs font-extrabold text-white flex items-center gap-1.5">
                 <span>{userHaplogroupCode}</span>
                 <span className="text-[10px] text-cyan-400/80 font-normal">
-                  ({userPathCodes.size} steps from Root)
+                  ({userPathCodes.size} steps from root)
                 </span>
               </div>
             </div>
@@ -445,9 +531,9 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
         </svg>
       </div>
 
-      {/* Node Details Modal / Flyout Panel */}
+      {/* Node Details Flyout Panel / Drawer */}
       {selectedNode && (
-        <div className="absolute bottom-6 right-6 w-96 max-w-[calc(100%-3rem)] rounded-2xl bg-[#0d1424]/95 border border-cyan-500/30 shadow-2xl p-5 backdrop-blur-xl z-30 animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-6 sm:right-6 sm:left-auto sm:w-96 rounded-2xl bg-[#0d1424]/95 border border-cyan-500/30 shadow-2xl p-5 backdrop-blur-xl z-30 animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[75vh] overflow-y-auto">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
               <div className="flex items-center gap-2">
@@ -460,22 +546,23 @@ export const PhylogeneticTreeViewer: React.FC<PhylogeneticTreeViewerProps> = ({
             </div>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/5"
+              className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              aria-label="Close Details"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="space-y-3 text-xs">
             <div className="flex items-center gap-2 text-slate-300">
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              <Clock className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <span>
                 Estimated Age: <strong className="text-white">{selectedNode.ageYearsBp}</strong>
               </span>
             </div>
 
             <div className="flex items-center gap-2 text-slate-300">
-              <MapPin className="w-3.5 h-3.5 text-rose-400" />
+              <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
               <span>
                 Origin: <strong className="text-white">{selectedNode.originRegion}</strong>
               </span>

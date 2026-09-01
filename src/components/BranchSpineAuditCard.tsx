@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { HaplogroupDefinition, EvaluatedMarker, LineageType } from '../types/haplogroup';
 import { auditBranchSpineAndPrivateVariants, BranchAuditResult } from '../services/branchAuditEngine';
+import { getMitomapAnnotation } from '../services/mitomapEngine';
+import { loadHelixDatabase, getCachedHelixFrequency } from '../services/helixEngine';
+import { checkNumtRisk, getGnomadAncestryFrequencies } from '../services/gnomadMtdnaEngine';
 import { 
   GitCommit, CheckCircle2, XCircle, HelpCircle, AlertTriangle, 
   ChevronDown, ChevronUp, Sparkles, Dna, ShieldCheck, ArrowDown
@@ -20,6 +23,13 @@ export const BranchSpineAuditCard: React.FC<BranchSpineAuditCardProps> = ({
   novelOrUntestedMarkers = []
 }) => {
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
+  const [, setHelixLoaded] = useState(false);
+
+  useEffect(() => {
+    if (lineageType === 'MATERNAL_MTDNA') {
+      loadHelixDatabase().then(() => setHelixLoaded(true));
+    }
+  }, [lineageType]);
 
   const audit: BranchAuditResult = useMemo(() => {
     return auditBranchSpineAndPrivateVariants(
@@ -174,34 +184,81 @@ export const BranchSpineAuditCard: React.FC<BranchSpineAuditCardProps> = ({
                   </div>
 
                   <div className="flex flex-wrap gap-1.5">
-                    {node.positiveMarkers.map((em) => (
-                      <span
-                        key={em.snp.name}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 font-mono text-[11px]"
-                      >
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        <span className="font-bold">{em.snp.name}</span>
-                        <span className="text-[9px] text-slate-400">({em.userGenotype})</span>
-                      </span>
-                    ))}
+                    {node.positiveMarkers.map((em) => {
+                      const mitomap = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getMitomapAnnotation(em.snp.position) : null;
+                      const helix = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getCachedHelixFrequency(em.snp.position, em.snp.ancestralAllele, em.snp.derivedAllele) : null;
+                      const gnomad = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getGnomadAncestryFrequencies(em.snp.position) : null;
+                      const numt = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? checkNumtRisk(em.snp.position) : null;
 
-                    {node.negativeMarkers.map((em) => (
-                      <span
-                        key={em.snp.name}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-950/60 border border-rose-700/50 text-rose-300 font-mono text-[11px]"
-                      >
-                        <XCircle className="w-3 h-3 text-rose-400" />
-                        <span className="font-bold">{em.snp.name}</span>
-                        <span className="text-[9px] text-slate-400">Ancestral</span>
-                      </span>
-                    ))}
+                      const tooltip = [
+                        mitomap ? `MITOMAP Gene: ${mitomap.gene} (${mitomap.geneName}) • ${mitomap.mutabilityIndex}` : em.snp.description,
+                        helix ? `HelixMTdb Global Freq: ${(helix.afHom * 100).toFixed(2)}% (${helix.hom.toLocaleString()} of 195,983 homoplasmic genomes)` : '',
+                        gnomad ? `gnomAD v3.1 Ancestry: EUR: ${(gnomad.europeanAf * 100).toFixed(1)}% | AFR: ${(gnomad.africanAf * 100).toFixed(1)}% | AMR: ${(gnomad.latinoAf * 100).toFixed(1)}%` : '',
+                        numt && numt.riskLevel !== 'LOW_NUMT_RISK' ? `⚠️ NUMT Risk: ${numt.explanation}` : ''
+                      ].filter(Boolean).join('\n');
+
+                      return (
+                        <span
+                          key={em.snp.name}
+                          title={tooltip}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 font-mono text-[11px]"
+                        >
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span className="font-bold">{em.snp.name}</span>
+                          <span className="text-[9px] text-slate-400">({em.userGenotype})</span>
+                          {mitomap && (
+                            <span className="text-[9px] font-sans px-1.5 py-0.2 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30">
+                              {mitomap.gene}
+                            </span>
+                          )}
+                          {helix && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-500/30">
+                              {(helix.afHom * 100).toFixed(1)}%
+                            </span>
+                          )}
+                          {numt && numt.riskLevel === 'HIGH_NUMT_HOMOLOGY' && (
+                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-950/80 text-amber-300 border border-amber-500/30" title="High NUMT homology region">
+                              NUMT
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
+
+                    {node.negativeMarkers.map((em) => {
+                      const mitomap = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getMitomapAnnotation(em.snp.position) : null;
+                      const helix = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getCachedHelixFrequency(em.snp.position, em.snp.ancestralAllele, em.snp.derivedAllele) : null;
+                      const gnomad = lineageType === 'MATERNAL_MTDNA' && em.snp.position ? getGnomadAncestryFrequencies(em.snp.position) : null;
+                      const tooltip = [
+                        mitomap ? `MITOMAP Gene: ${mitomap.gene} (${mitomap.geneName})` : em.snp.description,
+                        helix ? `HelixMTdb Derived Freq: ${(helix.afHom * 100).toFixed(2)}%` : '',
+                        gnomad ? `gnomAD v3.1: Top Ancestry ${gnomad.topAncestry}` : ''
+                      ].filter(Boolean).join('\n');
+
+                      return (
+                        <span
+                          key={em.snp.name}
+                          title={tooltip}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/60 border border-rose-700/50 text-rose-300 font-mono text-[11px]"
+                        >
+                          <XCircle className="w-3 h-3 text-rose-400 shrink-0" />
+                          <span className="font-bold">{em.snp.name}</span>
+                          <span className="text-[9px] text-slate-400">Ancestral</span>
+                          {mitomap && (
+                            <span className="text-[9px] font-sans px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-white/10">
+                              {mitomap.gene}
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
 
                     {node.uncalledMarkers.map((snp) => (
                       <span
                         key={snp}
                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 font-mono text-[11px]"
                       >
-                        <HelpCircle className="w-3 h-3 text-slate-500" />
+                        <HelpCircle className="w-3 h-3 text-slate-500 shrink-0" />
                         <span>{snp}</span>
                       </span>
                     ))}

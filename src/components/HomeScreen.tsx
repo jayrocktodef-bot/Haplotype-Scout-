@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { 
   Upload, Sparkles, FileText, Lock, Zap, Clock, Globe, 
-  ArrowRight, Trash2, Cpu, Compass, CheckCircle2, Binary, ChevronRight
+  ArrowRight, Trash2, Cpu, Compass, CheckCircle2, Binary, ChevronRight,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { SAMPLE_DNA_KITS } from '../data/sampleDnaKits';
 import { DnaAnalysisResult } from '../types/haplogroup';
@@ -33,6 +34,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [pastedText, setPastedText] = useState('');
   const [customKitName, setCustomKitName] = useState('My DNA Profile');
+  const [showGlobalReferences, setShowGlobalReferences] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -144,48 +146,77 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         
         {/* Left Column: 1-Click Interactive Benchmark Kits (2-col span) */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-base font-bold text-white uppercase tracking-wider">Global Reference Cohorts</h2>
-            </div>
-            <span className="text-xs text-slate-400 font-mono">1-Click Instant Analysis</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {SAMPLE_DNA_KITS.map((sample) => (
-              <div
-                key={sample.id}
-                onClick={() => onSelectSampleKit(sample.id)}
-                className="bento-card-interactive p-4 cursor-pointer flex flex-col justify-between group"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
-                      {sample.subtitle}
+          <div className="bento-card p-4 sm:p-5">
+            <button
+              onClick={() => setShowGlobalReferences(!showGlobalReferences)}
+              className="w-full flex items-center justify-between text-left group cursor-pointer focus:outline-none"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-cyan-950/60 border border-cyan-800/40 text-cyan-400">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm sm:text-base font-bold text-white uppercase tracking-wider group-hover:text-cyan-300 transition-colors">
+                      Global Reference Cohorts
+                    </h2>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-cyan-950/80 border border-cyan-800/50 text-cyan-400 font-semibold">
+                      {SAMPLE_DNA_KITS.length} Kits
                     </span>
-                    <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
                   </div>
-
-                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    {sample.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                    {sample.description}
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Pre-loaded archetypal modern & ancient test genomes for 1-click evaluation
                   </p>
                 </div>
+              </div>
 
-                <div className="flex items-center gap-2 pt-3 mt-3 border-t border-white/[0.04] text-[11px] font-mono">
-                  <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-300 font-bold">
-                    Y: {sample.paternalHaplo}
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-rose-300 font-bold">
-                    mt: {sample.maternalHaplo}
-                  </span>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 group-hover:text-cyan-300 transition-colors">
+                <span className="hidden sm:inline font-mono text-[11px]">
+                  {showGlobalReferences ? 'Collapse' : 'Expand'}
+                </span>
+                <div className="p-1 rounded-lg bg-slate-900 border border-white/[0.08] text-slate-400 group-hover:text-white transition-colors">
+                  {showGlobalReferences ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
               </div>
-            ))}
+            </button>
+
+            {showGlobalReferences && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-4 pt-4 border-t border-white/[0.06] animate-in fade-in duration-200">
+                {SAMPLE_DNA_KITS.map((sample) => (
+                  <div
+                    key={sample.id}
+                    onClick={() => onSelectSampleKit(sample.id)}
+                    className="bento-card-interactive p-4 cursor-pointer flex flex-col justify-between group"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
+                          {sample.subtitle}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                      </div>
+
+                      <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                        {sample.title}
+                      </h3>
+
+                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                        {sample.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-3 mt-3 border-t border-white/[0.04] text-[11px] font-mono">
+                      <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-300 font-bold">
+                        Y: {sample.paternalHaplo}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-rose-300 font-bold">
+                        mt: {sample.maternalHaplo}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -282,6 +313,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <p className="text-xs text-slate-400">
               Paste SNP markers with rsIDs or coordinates to execute instant in-browser classification.
             </p>
+            <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200 leading-normal">
+              ⚠️ <strong>Note:</strong> Most consumer microarray tests test only a fraction of Y-DNA &amp; mtDNA markers. Classification depth is strictly determined by the loci included in your pasted data.
+            </div>
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-300">Profile Name</label>
