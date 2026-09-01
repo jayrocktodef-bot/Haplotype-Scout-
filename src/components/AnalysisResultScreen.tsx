@@ -377,12 +377,22 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
                       }`}
                     >
                       <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <span className="font-bold text-slate-100 font-mono">{m.snp.name}</span>
                           <span className="text-[11px] text-slate-400 font-mono">({m.snp.rsid})</span>
                           <span className="px-1.5 py-0.2 text-[10px] rounded bg-slate-950/60 border border-slate-800 text-slate-300 font-mono">
                             Chr {m.snp.chromosome}:{m.snp.position.toLocaleString()}
                           </span>
+                          {m.isImputed && (
+                            <span className="px-1.5 py-0.2 text-[10px] rounded bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 font-semibold">
+                              LD Imputed
+                            </span>
+                          )}
+                          {(m.mutationWeight || 1.0) > 2.0 && (
+                            <span className="px-1.5 py-0.2 text-[10px] rounded bg-amber-950/80 border border-amber-700/60 text-amber-300 font-semibold">
+                              Transversion (4.5x)
+                            </span>
+                          )}
                         </div>
                         <p className="text-[11px] text-slate-400">{m.details}</p>
                       </div>

@@ -23,6 +23,9 @@ export interface EvaluatedMarker {
   userGenotype: string;     // e.g. "T", "TT", "AG", "--"
   status: MarkerStatus;
   details: string;
+  isImputed?: boolean;
+  imputedFrom?: string;
+  mutationWeight?: number;  // Higher for rare transversions (e.g. 5x vs 1x transitions)
 }
 
 export interface MigrationStep {
