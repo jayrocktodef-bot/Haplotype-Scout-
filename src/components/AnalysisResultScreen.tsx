@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
+import { TmrcaClockCard } from './TmrcaClockCard';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -199,6 +200,13 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Evolutionary Coalescence & TMRCA Clock Bento Card */}
+          <TmrcaClockCard
+            clade={currentAnalysis.terminalHaplogroup}
+            lineageType={activeLineage}
+            positiveMarkerCount={currentAnalysis.positiveCount}
+          />
 
           {/* Phylogenetic Lineage Path */}
           <div className="bento-card p-6 space-y-3">
