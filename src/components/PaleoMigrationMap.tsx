@@ -541,7 +541,7 @@ export const PaleoMigrationMap: React.FC<PaleoMigrationMapProps> = ({
                 <span className="text-[10px] font-mono text-slate-400">{step.timePeriod}</span>
               </div>
               <div className="font-bold text-white text-xs">{step.region}</div>
-              <p className="text-[11px] text-slate-400 line-clamp-2">{step.description}</p>
+              <p className="text-[11px] text-slate-300 leading-relaxed">{step.description}</p>
             </div>
           );
         })}

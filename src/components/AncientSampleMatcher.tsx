@@ -141,7 +141,7 @@ export const AncientSampleMatcher: React.FC<AncientSampleMatcherProps> = ({
                   <span>{specimen.ageYearsBp} ({specimen.calibratedBceDate})</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.04] text-[11px] text-slate-300 line-clamp-2">
+                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.04] text-[11px] text-slate-300 leading-relaxed">
                   {specimen.summaryDescription}
                 </div>
               </div>

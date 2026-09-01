@@ -135,13 +135,13 @@ export const EncyclopediaScreen: React.FC = () => {
                   {haplo.shortName}
                 </p>
 
-                <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed mb-3">
+                <p className="text-xs text-slate-300 leading-relaxed mb-3">
                   {haplo.historicalDescription}
                 </p>
 
                 <div className="flex items-center space-x-2 text-[11px] text-slate-400">
                   <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span className="truncate">{haplo.originRegion}</span>
+                  <span>{haplo.originRegion}</span>
                 </div>
               </div>
 
