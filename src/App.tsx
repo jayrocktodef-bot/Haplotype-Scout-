@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigation, NavTab } from './components/Navigation';
 import { HomeScreen } from './components/HomeScreen';
 import { AnalysisResultScreen } from './components/AnalysisResultScreen';
@@ -6,94 +6,86 @@ import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
-import confetti from 'canvas-confetti';
+import { SAMPLE_DNA_KITS } from './data/sampleDnaKits';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
   const [activeResult, setActiveResult] = useState<DnaAnalysisResult | null>(null);
   const [savedKits, setSavedKits] = useState<DnaAnalysisResult[]>([]);
-  
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingMessage, setProcessingMessage] = useState('');
 
-  // Load saved kits on mount
+  // Load saved kit results from IndexedDB on startup
   useEffect(() => {
     loadSavedKits();
   }, []);
 
   const loadSavedKits = async () => {
-    const kits = await getAllSavedKits();
-    setSavedKits(kits);
+    try {
+      const kits = await getAllSavedKits();
+      setSavedKits(kits);
+    } catch (e) {
+      console.error('Failed to load saved kits:', e);
+    }
   };
 
-  const runAnalysisWorker = (payload: { file?: File; text?: string; fileName?: string }) => {
+  const runWorkerAnalysis = (payload: { file?: File; rawText?: string; kitName: string }) => {
     setIsProcessing(true);
     setProcessingProgress(5);
-    setProcessingMessage('Spawning dedicated genomic Web Worker...');
+    setProcessingMessage('Initializing Web Worker...');
 
-    const worker = new Worker(new URL('./workers/dnaWorker.ts', import.meta.url), {
-      type: 'module'
-    });
+    const worker = new Worker(new URL('./workers/dnaWorker.ts', import.meta.url), { type: 'module' });
 
-    worker.onmessage = async (e) => {
-      const { type, progress, message, result, error } = e.data;
-
-      if (type === 'PROGRESS') {
-        if (progress !== undefined) setProcessingProgress(progress);
-        if (message) setProcessingMessage(message);
-      } else if (type === 'SUCCESS') {
-        setIsProcessing(false);
+    worker.onmessage = async (e: MessageEvent) => {
+      const data = e.data;
+      if (data.type === 'PROGRESS') {
+        setProcessingProgress(data.progress);
+        setProcessingMessage(data.message);
+      } else if (data.type === 'SUCCESS') {
+        const result: DnaAnalysisResult = data.result;
         setActiveResult(result);
         await saveAnalysisResult(result);
         await loadSavedKits();
-        setCurrentTab('result');
-
-        // Confetti celebration
-        try {
-          confetti({
-            particleCount: 60,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
-        } catch (_) {}
-
-        worker.terminate();
-      } else if (type === 'ERROR') {
         setIsProcessing(false);
-        alert(`Analysis Error: ${error || 'Failed to process raw DNA file.'}`);
+        setCurrentTab('result');
+        worker.terminate();
+      } else if (data.type === 'ERROR') {
+        alert(`Analysis error: ${data.message}`);
+        setIsProcessing(false);
         worker.terminate();
       }
     };
 
     worker.onerror = (err) => {
       console.error('Worker error:', err);
+      alert('An error occurred during genetic analysis in the Web Worker.');
       setIsProcessing(false);
-      alert('An error occurred inside the DNA analysis worker.');
       worker.terminate();
     };
 
-    if (payload.file) {
-      worker.postMessage({
-        type: 'PARSE_FILE',
-        file: payload.file,
-        fileName: payload.file.name
-      });
-    } else if (payload.text) {
-      worker.postMessage({
-        type: 'PARSE_TEXT',
-        text: payload.text,
-        fileName: payload.fileName || 'Pasted Sample'
-      });
-    }
+    worker.postMessage({
+      type: 'ANALYZE_DNA',
+      ...payload
+    });
   };
 
-  const handleAnalyzeFile = (file: File) => {
-    runAnalysisWorker({ file });
+  const handleFileUpload = (file: File) => {
+    const kitName = file.name.replace(/\.[^/.]+$/, '');
+    runWorkerAnalysis({ file, kitName });
   };
 
-  const handleAnalyzeText = (text: string, title: string) => {
-    runAnalysisWorker({ text, fileName: title });
+  const handleRawTextSubmit = (rawText: string, kitName: string) => {
+    runWorkerAnalysis({ rawText, kitName: kitName || 'Custom DNA Sample' });
+  };
+
+  const handleSelectSampleKit = (kitId: string) => {
+    const sample = SAMPLE_DNA_KITS.find(s => s.id === kitId);
+    if (!sample) return;
+    runWorkerAnalysis({
+      rawText: sample.rawSnippetContent,
+      kitName: sample.title
+    });
   };
 
   const handleSelectSavedKit = (kit: DnaAnalysisResult) => {
@@ -101,19 +93,22 @@ export const App: React.FC = () => {
     setCurrentTab('result');
   };
 
-  const handleDeleteSavedKit = async (id: string) => {
-    await deleteSavedKit(id);
-    if (activeResult?.id === id) {
-      setActiveResult(null);
-      if (currentTab === 'result') setCurrentTab('home');
+  const handleDeleteSavedKit = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this saved profile?')) {
+      await deleteSavedKit(id);
+      if (activeResult?.id === id) {
+        setActiveResult(null);
+        if (currentTab === 'result') setCurrentTab('home');
+      }
+      await loadSavedKits();
     }
-    await loadSavedKits();
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-[#09090b] text-slate-100 flex flex-col selection:bg-teal-500/30 selection:text-teal-200">
       
-      {/* Top Header Navigation */}
+      {/* Top Header Navigation matching Genotype Scout */}
       <Navigation
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
@@ -121,24 +116,25 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pt-20">
         {currentTab === 'home' && (
           <HomeScreen
-            onAnalyzeFile={handleAnalyzeFile}
-            onAnalyzeText={handleAnalyzeText}
+            onFileUpload={handleFileUpload}
+            onRawTextSubmit={handleRawTextSubmit}
+            onSelectSampleKit={handleSelectSampleKit}
+            savedResults={savedKits}
+            onSelectSavedResult={handleSelectSavedKit}
+            onDeleteSavedResult={handleDeleteSavedKit}
             isProcessing={isProcessing}
-            processingProgress={processingProgress}
-            processingMessage={processingMessage}
-            savedKits={savedKits}
-            onSelectSavedKit={handleSelectSavedKit}
-            onDeleteSavedKit={handleDeleteSavedKit}
+            progressPercent={processingProgress}
+            progressMessage={processingMessage}
           />
         )}
 
         {currentTab === 'result' && activeResult && (
           <AnalysisResultScreen
             result={activeResult}
-            onBack={() => setCurrentTab('home')}
+            onReset={() => setCurrentTab('home')}
           />
         )}
 
@@ -155,9 +151,9 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500 glass-panel">
+      <footer className="border-t border-white/[0.08] py-8 text-center text-xs text-slate-500 bg-[#09090b]/80 backdrop-blur-md">
         <p className="max-w-2xl mx-auto px-4">
-          <strong>Haplotype Scout PWA</strong> • Companion Tool to Genotype Scout • 100% Private Client-Side Genetic Exploration
+          <strong>Haplotype Scout PWA</strong> • SOTA In-Browser Phylogenetic Exploration • Written In The Genome
         </p>
       </footer>
 
