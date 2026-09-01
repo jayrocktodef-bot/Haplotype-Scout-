@@ -5,6 +5,7 @@ import { AnalysisResultScreen } from './components/AnalysisResultScreen';
 import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
 import { PhylogeneticTreeViewer } from './components/PhylogeneticTreeViewer';
+import { BetaNoticeModal } from './components/BetaNoticeModal';
 import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
@@ -19,6 +20,7 @@ export const App: React.FC = () => {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [processingMessage, setProcessingMessage] = useState('');
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [pendingUpload, setPendingUpload] = useState<{ file?: File; text?: string; kitName?: string } | null>(null);
 
   // Load saved kit results from IndexedDB on startup
   useEffect(() => {
@@ -34,7 +36,7 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleFileUpload = (file: File) => {
+  const executeFileUpload = (file: File) => {
     setIsProcessing(true);
     setProcessingProgress(0);
     setProcessingMessage('Initializing bioinformatics worker...');
@@ -76,7 +78,7 @@ export const App: React.FC = () => {
     });
   };
 
-  const handleRawTextSubmit = (rawText: string, kitName: string) => {
+  const executeRawTextSubmit = (rawText: string, kitName: string) => {
     setIsProcessing(true);
     setProcessingProgress(0);
     setProcessingMessage('Initializing analysis worker...');
@@ -112,11 +114,32 @@ export const App: React.FC = () => {
     });
   };
 
+  const handleFileUpload = (file: File) => {
+    setPendingUpload({ file });
+  };
+
+  const handleRawTextSubmit = (rawText: string, kitName: string) => {
+    setPendingUpload({ text: rawText, kitName });
+  };
+
   const handleSelectSampleKit = (kitKey: string) => {
     const sample = SAMPLE_DNA_KITS.find(k => k.id === kitKey);
     if (!sample) return;
 
-    handleRawTextSubmit(sample.rawSnippetContent, sample.title);
+    // Sample reference kits execute directly
+    executeRawTextSubmit(sample.rawSnippetContent, sample.title);
+  };
+
+  const handleConfirmNotice = () => {
+    if (!pendingUpload) return;
+    const { file, text, kitName } = pendingUpload;
+    setPendingUpload(null);
+
+    if (file) {
+      executeFileUpload(file);
+    } else if (text) {
+      executeRawTextSubmit(text, kitName || 'Uploaded DNA Snippet');
+    }
   };
 
   const handleSelectSavedKit = (kit: DnaAnalysisResult) => {
@@ -332,6 +355,14 @@ export const App: React.FC = () => {
           <p>© {new Date().getFullYear()} Written In The Genome. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Beta Advisory & Client-Side Notice Modal */}
+      <BetaNoticeModal
+        isOpen={pendingUpload !== null}
+        onConfirm={handleConfirmNotice}
+        onCancel={() => setPendingUpload(null)}
+        targetActionName={pendingUpload?.file ? 'File Processing' : 'DNA Analysis'}
+      />
 
       {/* Donation & Support Modal */}
       <DonationModal
