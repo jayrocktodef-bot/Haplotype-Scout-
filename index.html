@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
     <!-- Primary SEO & Title -->
-    <title>Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier</title>
-    <meta name="title" content="Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier" />
-    <meta name="description" content="100% private, client-side Y-DNA & mtDNA deep lineage haplogroup classifier with DAG tree walking, ISOGG Y-Tree radix navigation, Build 17 transversion weighting, and microhaplotype block phasing." />
-    <meta name="keywords" content="Haplogroup Classifier, Y-DNA haplogroup, mtDNA haplogroup, Phylogeny, Microhaplotypes, ISOGG, PhyloTree Build 17, DNA Lineage, Raw DNA analyzer, 23andMe haplogroups, AncestryDNA haplogroup, Written In The Genome" />
+    <title>Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier | Written in the Genome</title>
+    <meta name="title" content="Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier | Written in the Genome" />
+    <meta name="description" content="100% private, client-side Y-DNA & mtDNA deep lineage haplogroup classifier with DAG tree walking, ISOGG Y-Tree radix navigation, Build 17 transversion weighting, and microhaplotype block phasing. Part of the Written in the Genome genomic research suite." />
+    <meta name="keywords" content="Haplogroup Classifier, Y-DNA haplogroup, mtDNA haplogroup, Phylogeny, Microhaplotypes, ISOGG, PhyloTree Build 17, DNA Lineage, Raw DNA analyzer, 23andMe haplogroups, AncestryDNA haplogroup, Written In The Genome, Family Archive, Genotype Scout, DNA Merger" />
     <meta name="author" content="Written In The Genome" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     
@@ -17,7 +17,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6734186229480105" crossorigin="anonymous"></script>
     <script async src="https://widgets.givebutter.com/latest.umd.cjs?acct=vIWtSmp0ILaaJM6I&p=other"></script>
 
-    <!-- Google Tag Manager / Google Analytics (GA4 Tag: GT-PBCT4N7W) with cross-domain linking across blog suite -->
+    <!-- Google Tag Manager / Google Analytics (GA4 Tag: GT-PBCT4N7W) with cross-domain linking across the full Written in the Genome suite -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GT-PBCT4N7W"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -28,7 +28,8 @@
           'writteninthegenome.blog',
           'scout.writteninthegenome.blog',
           'haplotype.writteninthegenome.blog',
-          'merge.writteninthegenome.blog'
+          'merge.writteninthegenome.blog',
+          'familyarchive.writteninthegenome.blog'
         ]
       });
       gtag('config', 'GT-PBCT4N7W', {
@@ -43,10 +44,10 @@
 
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Written In The Genome Genomics Tools" />
+    <meta property="og:site_name" content="Written in the Genome – Genomics &amp; Lineage Suite" />
     <meta property="og:url" content="https://haplotype.writteninthegenome.blog/" />
-    <meta property="og:title" content="Haplotype Scout — Deep Y-DNA & mtDNA Lineage Mapping" />
-    <meta property="og:description" content="Analyze your raw DNA with DAG ancestral negative guarding, LD proxy imputation, and 100-block microhaplotype deconvolution. 100% in-browser." />
+    <meta property="og:title" content="Haplotype Scout — Deep Y-DNA & mtDNA Lineage Mapping | Written in the Genome" />
+    <meta property="og:description" content="Analyze your raw DNA with DAG ancestral negative guarding, LD proxy imputation, and 100-block microhaplotype deconvolution. 100% in-browser, zero upload." />
     <meta property="og:image" content="https://writteninthegenome.blog/wp-content/uploads/2026/04/17762177921467E26841384755661462607.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -71,7 +72,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Haplotype Scout" />
 
-    <!-- JSON-LD Structured Data Schema -->
+    <!-- JSON-LD Structured Data Schema - Suite & Organization Hierarchy -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -86,13 +87,10 @@
           "browserRequirements": "Requires JavaScript. Requires Web Workers & Web Crypto API.",
           "description": "High-accuracy, 100% in-browser Y-DNA & mtDNA haplogroup classifier with DAG tree walking, ISOGG Y-Tree navigation, Van Oven PhyloTree Build 17 engine, and microhaplotype block phasing.",
           "publisher": {
-            "@type": "Organization",
-            "name": "Written In The Genome",
-            "url": "https://writteninthegenome.blog",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp"
-            }
+            "@id": "https://writteninthegenome.blog/#organization"
+          },
+          "isPartOf": {
+            "@id": "https://writteninthegenome.blog/#website"
           },
           "offers": {
             "@type": "Offer",
@@ -101,14 +99,29 @@
           }
         },
         {
+          "@type": "Organization",
+          "@id": "https://writteninthegenome.blog/#organization",
+          "name": "Written In The Genome",
+          "url": "https://writteninthegenome.blog",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp"
+          },
+          "sameAs": [
+            "https://writteninthegenome.blog",
+            "https://scout.writteninthegenome.blog",
+            "https://haplotype.writteninthegenome.blog",
+            "https://merge.writteninthegenome.blog",
+            "https://familyarchive.writteninthegenome.blog"
+          ]
+        },
+        {
           "@type": "WebSite",
           "@id": "https://writteninthegenome.blog/#website",
           "url": "https://writteninthegenome.blog/",
           "name": "Written In The Genome",
           "publisher": {
-            "@type": "Organization",
-            "name": "Written In The Genome",
-            "url": "https://writteninthegenome.blog"
+            "@id": "https://writteninthegenome.blog/#organization"
           }
         }
       ]

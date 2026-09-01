@@ -8,7 +8,7 @@ import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
 import { SAMPLE_DNA_KITS } from './data/sampleDnaKits';
-import { Heart, ExternalLink, GitBranch, ShieldCheck, Compass, Sparkles, Activity } from 'lucide-react';
+import { Heart, ExternalLink, GitBranch, ShieldCheck, Compass, Sparkles, Activity, Dna, Database } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
@@ -246,6 +246,30 @@ export const App: React.FC = () => {
                 >
                   <Compass className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Haplotype Scout (Y &amp; mtDNA Studio)</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://merge.writteninthegenome.blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-300 hover:text-amber-400 font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <Dna className="w-3.5 h-3.5 text-amber-400" />
+                  <span>DNA SuperKit Builder (Raw Merger)</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://familyarchive.writteninthegenome.blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-300 hover:text-indigo-400 font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <Database className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Family Archive &amp; Records</span>
+                  <ExternalLink className="w-3 h-3 opacity-60" />
                 </a>
               </li>
               <li>
