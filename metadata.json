@@ -1,0 +1,6 @@
+{
+  "name": "Genotype Scout: Haplogroups",
+  "description": "Companion app to Genotype Scout for 100% private, on-device raw DNA analysis of paternal (Y-DNA) and maternal (mtDNA) haplogroups and ancestral lineage markers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
