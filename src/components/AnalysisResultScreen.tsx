@@ -7,6 +7,7 @@ import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
 import { TmrcaClockCard } from './TmrcaClockCard';
 import { BranchSpineAuditCard } from './BranchSpineAuditCard';
+import { PaleoMigrationMap } from './PaleoMigrationMap';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -255,6 +256,13 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
               })}
             </div>
           </div>
+
+          {/* Paleogeographic Steppe & Clan Migration Map */}
+          <PaleoMigrationMap
+            migrationSteps={currentAnalysis.terminalHaplogroup.migrationPath}
+            cladeCode={currentAnalysis.terminalHaplogroup.code}
+            lineageLabel={activeLineage === 'PATERNAL_YDNA' ? 'Paternal Y-DNA' : 'Maternal mtDNA'}
+          />
 
           {/* Phylogenetic Branch Mutation Ladder Audit & Private Variant Caller */}
           <BranchSpineAuditCard
