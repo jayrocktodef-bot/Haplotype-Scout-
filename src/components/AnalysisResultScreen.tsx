@@ -6,6 +6,7 @@ import {
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
 import { TmrcaClockCard } from './TmrcaClockCard';
+import { BranchSpineAuditCard } from './BranchSpineAuditCard';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -254,6 +255,14 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
               })}
             </div>
           </div>
+
+          {/* Phylogenetic Branch Mutation Ladder Audit & Private Variant Caller */}
+          <BranchSpineAuditCard
+            lineagePath={currentAnalysis.lineageTreePath}
+            evaluatedMarkers={currentAnalysis.evaluatedMarkers}
+            lineageType={activeLineage}
+            novelOrUntestedMarkers={currentAnalysis.novelOrUntestedMarkers}
+          />
 
           {/* Diagnostic Marker Inspector */}
           <div className="bento-card p-6 space-y-4">
