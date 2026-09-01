@@ -69,7 +69,36 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
 
     const result = HaplogroupClassifier.analyze(kitName, parsedData);
 
-    // Microhaplotype Deconvolution (if microhap kernel is present)
+    // 1. Deep mtDNA Evaluation via Van Oven PhyloTree Build 17
+    try {
+      const mtResponse = await fetch('/data/master_mtdna.json');
+      if (mtResponse.ok) {
+        const mtData = await mtResponse.json();
+        const { matchPhyloTreeBuild17 } = await import('../services/phylotreeMtdnaEngine');
+        
+        // Extract numeric mtDNA positions from parsedData
+        const mtPosMap: Record<number, string> = {};
+        for (const [key, val] of Object.entries(parsedData.snpByPosition)) {
+          if (key.startsWith('mt:')) {
+            const pos = parseInt(key.replace('mt:', ''), 10);
+            if (!isNaN(pos)) mtPosMap[pos] = val;
+          }
+        }
+
+        const deepMtMatches = matchPhyloTreeBuild17(mtPosMap, mtData.haplogroups);
+        if (deepMtMatches.length > 0 && result.maternalLineage) {
+          const topMatch = deepMtMatches[0];
+          // If deep match matches or refines current assignment, incorporate top mutations
+          if (topMatch.score > 2.0 && topMatch.matchedCount >= 1) {
+            result.maternalLineage.novelOrUntestedMarkers = topMatch.matchedMutations;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Deep mtDNA Build 17 resolution skipped:', e);
+    }
+
+    // 2. Microhaplotype Deconvolution (if microhap kernel is present)
     try {
       const response = await fetch('/data/microhap_kernel.json');
       if (response.ok) {
