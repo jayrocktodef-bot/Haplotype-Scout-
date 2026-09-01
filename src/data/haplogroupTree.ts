@@ -405,61 +405,116 @@ export const Y_DNA_HAPLOGROUPS: HaplogroupDefinition[] = [
 ];
 
 export const MT_DNA_HAPLOGROUPS: HaplogroupDefinition[] = [
+  // ── Root: L0 — Mitochondrial Eve / Khoisan
   {
     code: "L0",
-    shortName: "Haplogroup L0 (Mitochondrial Eve)",
+    shortName: "Haplogroup L0 (Mitochondrial Eve / Khoisan)",
     cladeName: "mtDNA-L0",
     lineageType: "MATERNAL_MTDNA",
     parentClade: null,
-    definingSnps: ["mt146", "mt182", "mt4312", "mt10664"],
+    definingSnps: ["146C", "16129A", "mt4312", "mt10664"],
     ageYearsBp: "~150,000 - 200,000 BP",
     originRegion: "Southern / Eastern Africa",
-    historicalDescription: "Root maternal lineage representing the matrilineal most recent common ancestor (Mitochondrial Eve). Retained at highest frequency in Khoisan hunter-gatherers.",
+    historicalDescription: "Root maternal lineage — the matrilineal most recent common ancestor of all living humans (Mitochondrial Eve). Highest frequency in San / Khoisan hunter-gatherers of the Kalahari.",
     ancientCultures: ["Early Anatomically Modern Humans"],
     highFrequencyModern: ["San / Khoisan (70-90%)", "Southern Africa", "East Africa"],
     migrationPath: [
-      { order: 1, region: "Kalahari / Southern Africa", timePeriod: "150,000 BP", description: "Deepest human maternal divergence." }
+      { order: 1, region: "Kalahari / Southern Africa", timePeriod: "150,000 BP", description: "Deepest human maternal divergence — the root of the mitochondrial tree." }
     ]
   },
+  // ── L1: Central / West African basal clade
+  {
+    code: "L1",
+    shortName: "Haplogroup L1 (Central African Basal)",
+    cladeName: "mtDNA-L1",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "L0",
+    definingSnps: ["3666A", "7055A"],
+    ageYearsBp: "~120,000 BP",
+    originRegion: "Central / West Africa",
+    historicalDescription: "Basal maternal clade primarily found in Central and West African forest populations, Pygmy hunter-gatherers, and some Bantu groups.",
+    ancientCultures: ["Central African Hunter-Gatherers", "Pygmy Groups"],
+    highFrequencyModern: ["Central Africa Pygmies (60%)", "Cameroon (20%)", "West Africa (10%)"],
+    migrationPath: [
+      { order: 1, region: "Central African Rainforest", timePeriod: "120,000 BP", description: "Diversification of deep African maternal lineages." }
+    ]
+  },
+  // ── L2: West African & African-American
   {
     code: "L2",
     shortName: "Haplogroup L2 (West & Central African)",
     cladeName: "mtDNA-L2",
     lineageType: "MATERNAL_MTDNA",
     parentClade: "L0",
-    definingSnps: ["mt143", "mt789", "mt8701", "mt9540", "mt16278", "rs2853496"],
+    definingSnps: ["13590A", "16278T", "mt143", "mt789"],
     ageYearsBp: "~90,000 BP",
     originRegion: "West / Central Africa",
-    historicalDescription: "The most widespread maternal haplogroup across sub-Saharan Africa, prominent in African Americans through the transatlantic period.",
+    historicalDescription: "Most widespread maternal haplogroup across sub-Saharan Africa, prominent in African Americans through the transatlantic period.",
     ancientCultures: ["Bantu Expansion", "West African Neolithic"],
     highFrequencyModern: ["West Africa (30-40%)", "Central Africa (35%)", "African Americans (~30%)"],
     migrationPath: [
       { order: 1, region: "West Africa", timePeriod: "90,000 BP", description: "Expansion across tropical and savannah zones." }
     ]
   },
+  // ── L2a: Most common L2 subclade
+  {
+    code: "L2a",
+    shortName: "Haplogroup L2a (Dominant West African subclade)",
+    cladeName: "mtDNA-L2a",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "L2",
+    definingSnps: ["15950G"],
+    ageYearsBp: "~60,000 BP",
+    originRegion: "West Africa / Guinea Coast",
+    historicalDescription: "The most frequent L2 branch, dominant in Guinea, Nigeria, Ghana. A major founding lineage among African Americans via the transatlantic slave trade.",
+    ancientCultures: ["Yoruba / Igbo Ancestry"],
+    highFrequencyModern: ["West Africa Guinea Coast (40-50%)", "African Americans (25%)"],
+    migrationPath: [
+      { order: 1, region: "Guinea-Nigeria Corridor", timePeriod: "60,000 BP", description: "Expansion of L2a across the West African coastal belt." }
+    ]
+  },
+  // ── L2a1: subclade of L2a (corrected from L3)
+  {
+    code: "L2a1",
+    shortName: "Haplogroup L2a1",
+    cladeName: "mtDNA-L2a1",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "L2a",
+    definingSnps: ["3594T"],
+    ageYearsBp: "~40,000 BP",
+    originRegion: "West Africa",
+    historicalDescription: "Prominent L2a subclade found in Nigerian and Ghanaian populations and in significant proportions of African Americans.",
+    ancientCultures: ["West African Agricultural Communities"],
+    highFrequencyModern: ["Nigeria (15%)", "Ghana (12%)", "African Americans (8%)"],
+    migrationPath: [
+      { order: 1, region: "West Africa", timePeriod: "40,000 BP", description: "L2a1 subclade expansion across West African farming communities." }
+    ]
+  },
+  // ── L3: Out of Africa Ancestor
   {
     code: "L3",
     shortName: "Haplogroup L3 (Out of Africa Maternal Ancestor)",
     cladeName: "mtDNA-L3",
     lineageType: "MATERNAL_MTDNA",
     parentClade: "L0",
-    definingSnps: ["mt769", "mt1018", "mt3594", "mt7256", "mt13650", "rs2853493", "rs2853494", "rs2853495"],
+    definingSnps: ["769A", "1018A", "mt7256", "mt13650"],
     ageYearsBp: "~70,000 BP",
     originRegion: "East Africa (Horn of Africa)",
-    historicalDescription: "The direct maternal ancestor to haplogroups M and N, which encompass every maternal lineage found outside of Africa.",
+    historicalDescription: "Direct maternal ancestor to haplogroups M and N, which encompass every maternal lineage found outside of Africa.",
     ancientCultures: ["Out of Africa Migration Pioneers"],
     highFrequencyModern: ["Horn of Africa (Ethiopia, Somalia 30-40%)", "East Africa"],
     migrationPath: [
       { order: 1, region: "Horn of Africa", timePeriod: "70,000 BP", description: "Maternal lineage crossing into Eurasia giving rise to clades M and N." }
     ]
   },
+  // ── M: Macrohaplogroup
   {
     code: "M",
     shortName: "Macrohaplogroup M (Eurasian / Asian / Indigenous American)",
     cladeName: "mtDNA-M",
     lineageType: "MATERNAL_MTDNA",
     parentClade: "L3",
-    definingSnps: ["mt489", "mt10400", "mt14783", "mt15043", "rs2853497", "rs2853498"],
+    definingSnps: ["489C", "10400T", "16311C", "mt14783", "mt15043"],
     ageYearsBp: "~60,000 BP",
     originRegion: "South Asia / Coastal Eurasia",
     historicalDescription: "Major Eurasian founder clade. Dominant in South Asia and East Asia, giving rise to C, D, G, Z branches in Asia and the Americas.",
@@ -469,179 +524,117 @@ export const MT_DNA_HAPLOGROUPS: HaplogroupDefinition[] = [
       { order: 1, region: "Indian Ocean Rim", timePeriod: "60,000 BP", description: "Rapid coastal migration towards Sundaland and East Asia." }
     ]
   },
+  // ── M7: Japan / East Asia
   {
-    code: "N",
-    shortName: "Macrohaplogroup N",
-    cladeName: "mtDNA-N",
+    code: "M7",
+    shortName: "Haplogroup M7 (East Asian / Japanese)",
+    cladeName: "mtDNA-M7",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "L3",
-    definingSnps: ["mt8701", "mt9540", "mt10398", "mt10873", "mt15301", "rs2853491", "rs2853492"],
-    ageYearsBp: "~60,000 BP",
-    originRegion: "Near East / South Asia",
-    historicalDescription: "Parent to haplogroup R, which includes almost all European maternal lineages (H, V, J, T, U, K) as well as A, B, X.",
-    ancientCultures: ["Early Eurasian Pioneers"],
-    highFrequencyModern: ["Found across all non-African populations via daughter clades"],
+    parentClade: "M",
+    definingSnps: ["4312C"],
+    ageYearsBp: "~35,000 BP",
+    originRegion: "East Asia / Japan",
+    historicalDescription: "Prominent in Japan, Korea and Southeast Asia. Important for discriminating from D and C subclades of M.",
+    ancientCultures: ["Jomon Japan", "Early East Asian Foragers"],
+    highFrequencyModern: ["Japan (15%)", "Korea (8%)", "SE Asia (10%)"],
     migrationPath: [
-      { order: 1, region: "Near East / Anatolia", timePeriod: "60,000 BP", description: "Settlement of West Eurasia and diversification of haplogroup R." }
+      { order: 1, region: "East Asian Rim", timePeriod: "35,000 BP", description: "Coastal expansion across East Asia and the Japanese archipelago." }
     ]
   },
+  // ── M8: Ancestor of C and Z
   {
-    code: "U",
-    shortName: "Haplogroup U (Ancient Hunter-Gatherer)",
-    cladeName: "mtDNA-U",
+    code: "M8",
+    shortName: "Haplogroup M8 (Ancestor of C and Z)",
+    cladeName: "mtDNA-M8",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "N",
-    definingSnps: ["mt11467", "mt12308", "mt12372", "mt1811", "rs2853510", "rs2853511"],
-    ageYearsBp: "~45,000 BP (Upper Paleolithic)",
-    originRegion: "Near East / Europe",
-    historicalDescription: "One of the oldest maternal lineages in Europe. Subclade U5 was the dominant maternal lineage of Western European Mesolithic hunter-gatherers (WHG).",
-    ancientCultures: ["Aurignacian", "Gravettian", "Western Hunter-Gatherers (WHG)", "Cheddar Man"],
-    highFrequencyModern: ["Scandinavia (U5 in Saami ~50%)", "Baltic States (15-20%)", "Caucasus (U4/U7)", "India (U2/U7)"],
+    parentClade: "M",
+    definingSnps: ["9824C"],
+    ageYearsBp: "~40,000 BP",
+    originRegion: "Northeast Asia / Siberia",
+    historicalDescription: "Intermediate clade bridging M to haplogroups C and Z — critical node for Siberian and Native American classification.",
+    ancientCultures: ["Northern Siberian Hunter-Gatherers"],
+    highFrequencyModern: ["Ancestral to C and Z subclades"],
     migrationPath: [
-      { order: 1, region: "Balkans & Western Europe", timePeriod: "45,000 BP", description: "Upper Paleolithic colonization of ice-age Europe." }
+      { order: 1, region: "Northeast Asia / Siberia", timePeriod: "40,000 BP", description: "Diversification of C and Z Siberian branches." }
     ]
   },
+  // ── M9
   {
-    code: "U5b",
-    shortName: "U5b (Mesolithic European Hunter-Gatherer)",
-    cladeName: "mtDNA-U5b",
+    code: "M9",
+    shortName: "Haplogroup M9",
+    cladeName: "mtDNA-M9",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "U",
-    definingSnps: ["mt7768", "mt14182", "mt16270", "mt150", "rs2853512", "rs2853513"],
-    ageYearsBp: "~22,000 BP",
-    originRegion: "Southwestern Europe (Franco-Cantabrian Ice Age Refuge)",
-    historicalDescription: "The iconic maternal lineage of post-glacial European hunter-gatherers, found in Cheddar Man and ancient burials across France, Spain, and Britain.",
-    ancientCultures: ["Magdalenian", "Azilian", "Mesolithic Britain / Cheddar Man"],
-    highFrequencyModern: ["Saami of Lapland (50%)", "Basques (15%)", "Finns (10%)", "Northern & Western Europe (8-12%)"],
+    parentClade: "M",
+    definingSnps: ["4715C"],
+    ageYearsBp: "~38,000 BP",
+    originRegion: "Central / Southeast Asia",
+    historicalDescription: "Ancestor to haplogroup E and related Q-branch subclades prevalent in SE Asia and the Pacific.",
+    ancientCultures: ["SE Asian Early Foragers"],
+    highFrequencyModern: ["SE Asia (5%)", "Pacific Islands (5%)"],
     migrationPath: [
-      { order: 1, region: "Franco-Cantabrian Caves", timePeriod: "20,000 BP", description: "Survival through the Last Glacial Maximum." },
-      { order: 2, region: "Deglaciated Northern Europe", timePeriod: "11,000 BP", description: "Pioneering recolonization of Britain, Scandinavia, and the Baltic." }
+      { order: 1, region: "SE Asia", timePeriod: "38,000 BP", description: "Diversification towards Pacific island-hopping peoples." }
     ]
   },
+  // ── C: Siberian / Native American founding lineage
   {
-    code: "H",
-    shortName: "Haplogroup H (Helena - Queen of Europe)",
-    cladeName: "mtDNA-H",
+    code: "C",
+    shortName: "Haplogroup C (Siberian / Indigenous American Founder)",
+    cladeName: "mtDNA-C",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "N",
-    definingSnps: ["mt2706", "mt7028", "rs2853499", "rs28358280"],
-    ageYearsBp: "~25,000 BP",
-    originRegion: "Near East / Caucasus / Southern Europe",
-    historicalDescription: "The single most common maternal lineage in modern Europe (~40-50% of all Europeans). Expanded massively from Ice Age refuges and during the Neolithic/Bronze Age.",
-    ancientCultures: ["Epigravettian", "Bell Beaker", "Unetice", "Cardial Farmers"],
-    highFrequencyModern: ["Spain / Basque (45-50%)", "United Kingdom (45%)", "Scandinavia (42%)", "Germany (43%)", "France (45%)"],
+    parentClade: "M8",
+    definingSnps: ["13263G", "11969A"],
+    ageYearsBp: "~30,000 BP",
+    originRegion: "Siberia / Northeast Asia",
+    historicalDescription: "One of the five founding maternal lineages of Indigenous Americans. Also common in Altaic and Turkic Siberian groups.",
+    ancientCultures: ["Clovis Culture", "Ancient Beringians", "Nenets / Evenks"],
+    highFrequencyModern: ["Siberians (15-25%)", "Native North Americans (30-40%)", "Mongolians (10%)"],
     migrationPath: [
-      { order: 1, region: "Near East & Anatolia", timePeriod: "25,000 BP", description: "Divergence from HV stem." },
-      { order: 2, region: "Iberian & Balkan Refuges", timePeriod: "18,000 BP", description: "Expansion across Western Europe after Ice Age retreat." }
+      { order: 1, region: "Lake Baikal / Siberia", timePeriod: "25,000 BP", description: "Cold-adapted Siberian ancestral populations." },
+      { order: 2, region: "Bering Land Bridge / Americas", timePeriod: "16,000 BP", description: "One of the founding maternal clades crossing into the Americas." }
     ]
   },
+  // ── Z: Siberian / Manchu / NE Asian
   {
-    code: "H1",
-    shortName: "H1 (Western European Matriarch)",
-    cladeName: "mtDNA-H1",
+    code: "Z",
+    shortName: "Haplogroup Z (Siberian / Manchu NE Asian)",
+    cladeName: "mtDNA-Z",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "H",
-    definingSnps: ["mt3010", "mt16189", "rs28358281", "rs2853515"],
-    ageYearsBp: "~13,000 BP",
-    originRegion: "Franco-Cantabrian Refuge (Iberia / Southwest France)",
-    historicalDescription: "The most frequent single subclade in Western Europe, expanding across the continent following the retreat of the glaciers.",
-    ancientCultures: ["Magdalenian", "Megalithic Builders", "Celtic & Germanic Peoples"],
-    highFrequencyModern: ["Basque Country (30%)", "Galicia & Portugal (25-30%)", "Norway (25%)", "British Isles (20-25%)"],
+    parentClade: "M8",
+    definingSnps: ["15784C"],
+    ageYearsBp: "~20,000 BP",
+    originRegion: "Northeast Asia / Manchuria",
+    historicalDescription: "Sibling to haplogroup C. Found at low but consistent frequency across northeastern Asia including Koreans, Manchu, and Saami.",
+    ancientCultures: ["Manchurian Nomads"],
+    highFrequencyModern: ["Saami (12%)", "Korea (2-3%)", "Manchu / Tungusic (5%)"],
     migrationPath: [
-      { order: 1, region: "Pyrenees & Bay of Biscay", timePeriod: "13,000 BP", description: "Rapid post-glacial demographic expansion." },
-      { order: 2, region: "Atlantic Seaboard & Scandinavia", timePeriod: "8,000 BP", description: "Integration into early European farming and megalithic communities." }
+      { order: 1, region: "Manchuria / NE China", timePeriod: "20,000 BP", description: "Z expansion across the northeastern Asian taiga." }
     ]
   },
+  // ── D: Root (D*, D5 classification)
   {
-    code: "H2",
-    shortName: "H2 (Eastern & Central European)",
-    cladeName: "mtDNA-H2",
+    code: "D",
+    shortName: "Haplogroup D (Siberian / East Asian Root)",
+    cladeName: "mtDNA-D",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "H",
-    definingSnps: ["mt1438", "mt4769", "rs2853500"],
-    ageYearsBp: "~15,000 BP",
-    originRegion: "Near East / Anatolia",
-    historicalDescription: "Associated with early Neolithic farming expansions into Central Europe and the Mediterranean basin.",
-    ancientCultures: ["Linear Pottery (LBK)", "Vinča Culture"],
-    highFrequencyModern: ["Sardinia (8%)", "Central Europe (5-8%)", "Levant (4%)"],
+    parentClade: "M",
+    definingSnps: ["2092C", "4883T"],
+    ageYearsBp: "~45,000 BP",
+    originRegion: "Northeast Asia / Central Siberia",
+    historicalDescription: "Root clade to D4 and D5. Broad D* samples and the D5 subclade (Japanese, Korean) need the root markers for correct classification.",
+    ancientCultures: ["Ancient Northern East Asians"],
+    highFrequencyModern: ["Ancestral to D4 and D5 subclades"],
     migrationPath: [
-      { order: 1, region: "Anatolia to Balkans", timePeriod: "9,000 BP", description: "Neolithic agricultural dispersal." }
+      { order: 1, region: "Central Siberia", timePeriod: "45,000 BP", description: "Basal D diversification into D4 and D5 branches." }
     ]
   },
-  {
-    code: "H3",
-    shortName: "H3 (Atlantic / Iberian)",
-    cladeName: "mtDNA-H3",
-    lineageType: "MATERNAL_MTDNA",
-    parentClade: "H",
-    definingSnps: ["mt6776", "rs28358282"],
-    ageYearsBp: "~11,000 BP",
-    originRegion: "Iberia / Western Mediterranean",
-    historicalDescription: "Second most common H branch in Western Europe, especially enriched in the Basque Country and Sardinia.",
-    ancientCultures: ["Cardial Pottery", "Nuragic Sardinia", "Atlantic Bronze Age"],
-    highFrequencyModern: ["Sardinia (18%)", "Basques (14%)", "Portugal (12%)", "Ireland (10%)"],
-    migrationPath: [
-      { order: 1, region: "Iberia & Western Mediterranean", timePeriod: "11,000 BP", description: "Maritime and coastal foraging and early pastoralism." }
-    ]
-  },
-  {
-    code: "J1c",
-    shortName: "J1c (Jasmine - Neolithic Farming Expansion)",
-    cladeName: "mtDNA-J1c",
-    lineageType: "MATERNAL_MTDNA",
-    parentClade: "N",
-    definingSnps: ["mt185", "mt295", "mt462", "mt14798", "mt16069", "rs2853501", "rs2853516"],
-    ageYearsBp: "~15,000 BP",
-    originRegion: "Near East / Fertile Crescent",
-    historicalDescription: "Carried across Europe by early Neolithic farmers bringing agriculture, pottery, and animal husbandry into Central and Northern Europe.",
-    ancientCultures: ["Linear Pottery (LBK)", "Starčevo–Körös", "Ancient Near Eastern Agronomists"],
-    highFrequencyModern: ["Central Europe (8-12%)", "British Isles (8%)", "Scandinavia (7%)", "Near East (10%)"],
-    migrationPath: [
-      { order: 1, region: "Fertile Crescent", timePeriod: "12,000 BP", description: "Domestication of emmer wheat and goats." },
-      { order: 2, region: "Danube River Valley", timePeriod: "7,500 BP", description: "Rapid spread of LBK farming across Western and Northern Europe." }
-    ]
-  },
-  {
-    code: "T2",
-    shortName: "T2 (Tara - Steppe & Neolithic Agrarian)",
-    cladeName: "mtDNA-T2",
-    lineageType: "MATERNAL_MTDNA",
-    parentClade: "N",
-    definingSnps: ["mt709", "mt1888", "mt8697", "mt10463", "mt16126", "rs2853503", "rs2853517"],
-    ageYearsBp: "~16,000 BP",
-    originRegion: "Near East / Caucasus / Pontic Steppe",
-    historicalDescription: "Associated with both the Neolithic agricultural diffusion and subsequent Bronze Age Yamnaya steppe pastoralist migrations.",
-    ancientCultures: ["Yamnaya", "Corded Ware", "Neolithic Farmers"],
-    highFrequencyModern: ["Eastern Europe (8-10%)", "Scandinavia (7%)", "Italy (6%)", "Iran / Levant (8%)"],
-    migrationPath: [
-      { order: 1, region: "Caucasus / Steppe", timePeriod: "10,000 BP", description: "Pastoralist adaptations." },
-      { order: 2, region: "Northern & Eastern Europe", timePeriod: "5,000 BP", description: "Steppe expansions associated with Indo-European languages." }
-    ]
-  },
-  {
-    code: "K1a",
-    shortName: "K1a (Katrine - Ötzi & Cardial Mediterranean)",
-    cladeName: "mtDNA-K1a",
-    lineageType: "MATERNAL_MTDNA",
-    parentClade: "N",
-    definingSnps: ["mt497", "mt1189", "mt9055", "mt10550", "rs2853502", "rs2853518"],
-    ageYearsBp: "~16,000 BP",
-    originRegion: "Near East / Anatolia / Mediterranean",
-    historicalDescription: "Key marker of early European farmers and ancient Alpine populations. Ötzi the Iceman had an extinct subclade of K1 (K1f).",
-    ancientCultures: ["Ötzi the Iceman", "Cardial Ware", "Levantine Early Farmers", "Ashkenazi Matriarchs"],
-    highFrequencyModern: ["Ashkenazi Jewish (32%)", "Alps / Tyrol (8-10%)", "Cyprus (10%)", "Levant (8%)"],
-    migrationPath: [
-      { order: 1, region: "Levant & Anatolia", timePeriod: "15,000 BP", description: "Epipaleolithic origins." },
-      { order: 2, region: "Mediterranean Basin & Alps", timePeriod: "8,000 BP", description: "Neolithic maritime migration to Italy, Spain, and Central Europe." }
-    ]
-  },
+  // ── D4: East Asian / Siberian subclade
   {
     code: "D4",
     shortName: "Haplogroup D4 (East Asian / Siberian)",
     cladeName: "mtDNA-D4",
     lineageType: "MATERNAL_MTDNA",
-    parentClade: "M",
-    definingSnps: ["mt3010", "mt8414", "mt14668", "rs2853504", "rs2853519"],
+    parentClade: "D",
+    definingSnps: ["8414T", "14668T", "mt3010"],
     ageYearsBp: "~28,000 BP",
     originRegion: "Northern East Asia / Southern Siberia",
     historicalDescription: "One of the most widespread maternal lineages in East Asia and Siberia. Subclades are also ancestral to Indigenous American haplogroup D lineages.",
@@ -652,13 +645,362 @@ export const MT_DNA_HAPLOGROUPS: HaplogroupDefinition[] = [
       { order: 2, region: "Japanese Archipelago & Yellow River", timePeriod: "10,000 BP", description: "Yayoi agricultural diffusion and Yayoi-Jomon admixture." }
     ]
   },
+  // ── N: Macrohaplogroup
+  {
+    code: "N",
+    shortName: "Macrohaplogroup N",
+    cladeName: "mtDNA-N",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "L3",
+    definingSnps: ["8701G", "10398G", "150C", "10238C", "mt9540", "mt10873", "mt15301"],
+    ageYearsBp: "~60,000 BP",
+    originRegion: "Near East / South Asia",
+    historicalDescription: "Parent to haplogroup R, which includes almost all European maternal lineages (H, V, J, T, U, K) as well as A, B, X, W, I.",
+    ancientCultures: ["Early Eurasian Pioneers"],
+    highFrequencyModern: ["Found across all non-African populations via daughter clades"],
+    migrationPath: [
+      { order: 1, region: "Near East / Anatolia", timePeriod: "60,000 BP", description: "Settlement of West Eurasia and diversification of haplogroup R." }
+    ]
+  },
+  // ── X: Native American X2a + European Relic
+  {
+    code: "X",
+    shortName: "Haplogroup X (Native American X2a & European Relic)",
+    cladeName: "mtDNA-X",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["6371T", "14470C"],
+    ageYearsBp: "~30,000 BP",
+    originRegion: "Near East / Central Asia",
+    historicalDescription: "One of the five Indigenous American founding clades (X2a). Also found in low frequencies in the Near East and Europe. Often mislabelled as U or N* without proper diagnostic markers.",
+    ancientCultures: ["Clovis Culture Horizon", "Ancient Near Eastern Populations"],
+    highFrequencyModern: ["Algonquin / Ojibwe (~25%)", "Druze (10%)", "Basques (3%)", "Near East (3-5%)"],
+    migrationPath: [
+      { order: 1, region: "Near East / Altai", timePeriod: "20,000 BP", description: "Trans-Eurasian migration of X2a clade into North America." },
+      { order: 2, region: "North America (Great Lakes)", timePeriod: "14,000 BP", description: "X2a establishing presence in Algonquin and Ojibwe peoples." }
+    ]
+  },
+  // ── HV: Ancestor of H and V (critical root node)
+  {
+    code: "HV",
+    shortName: "Haplogroup HV (Ancestral to H and V)",
+    cladeName: "mtDNA-HV",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["14766C"],
+    ageYearsBp: "~30,000 BP",
+    originRegion: "Near East / Caucasus",
+    historicalDescription: "Basal ancestor to the H and V haplogroups. This intermediate node is critical for correct H/V classification — without it, H and V share no distinguishing root.",
+    ancientCultures: ["Epipaleolithic Near East"],
+    highFrequencyModern: ["Caucasus (HV0 ~5%)", "Near East (HV1 ~3%)", "Ancestral to H & V"],
+    migrationPath: [
+      { order: 1, region: "Caucasus / Near East", timePeriod: "30,000 BP", description: "Divergence of HV from N lineage, preceding H and V separation." }
+    ]
+  },
+  // ── H: Helena (most common European maternal)
+  {
+    code: "H",
+    shortName: "Haplogroup H (Helena — Queen of Europe)",
+    cladeName: "mtDNA-H",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "HV",
+    definingSnps: ["2706G", "7028C"],
+    ageYearsBp: "~25,000 BP",
+    originRegion: "Near East / Caucasus / Southern Europe",
+    historicalDescription: "The single most common maternal lineage in modern Europe (~40-50% of all Europeans). Expanded massively from Ice Age refuges and during the Neolithic/Bronze Age.",
+    ancientCultures: ["Epigravettian", "Bell Beaker", "Unetice", "Cardial Farmers"],
+    highFrequencyModern: ["Spain / Basque (45-50%)", "United Kingdom (45%)", "Scandinavia (42%)", "Germany (43%)", "France (45%)"],
+    migrationPath: [
+      { order: 1, region: "Near East & Anatolia", timePeriod: "25,000 BP", description: "Divergence from HV stem." },
+      { order: 2, region: "Iberian & Balkan Refuges", timePeriod: "18,000 BP", description: "Expansion across Western Europe after Ice Age retreat." }
+    ]
+  },
+  // ── H1
+  {
+    code: "H1",
+    shortName: "H1 (Western European Matriarch)",
+    cladeName: "mtDNA-H1",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "H",
+    definingSnps: ["3010A", "16189C"],
+    ageYearsBp: "~13,000 BP",
+    originRegion: "Franco-Cantabrian Refuge (Iberia / Southwest France)",
+    historicalDescription: "Most frequent single subclade in Western Europe, expanding across the continent following the retreat of the glaciers.",
+    ancientCultures: ["Magdalenian", "Megalithic Builders", "Celtic & Germanic Peoples"],
+    highFrequencyModern: ["Basque Country (30%)", "Galicia & Portugal (25-30%)", "Norway (25%)", "British Isles (20-25%)"],
+    migrationPath: [
+      { order: 1, region: "Pyrenees & Bay of Biscay", timePeriod: "13,000 BP", description: "Rapid post-glacial demographic expansion." },
+      { order: 2, region: "Atlantic Seaboard & Scandinavia", timePeriod: "8,000 BP", description: "Integration into early European farming and megalithic communities." }
+    ]
+  },
+  // ── H2
+  {
+    code: "H2",
+    shortName: "H2 (Eastern & Central European)",
+    cladeName: "mtDNA-H2",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "H",
+    definingSnps: ["1438A", "mt4769"],
+    ageYearsBp: "~15,000 BP",
+    originRegion: "Near East / Anatolia",
+    historicalDescription: "Associated with early Neolithic farming expansions into Central Europe and the Mediterranean basin.",
+    ancientCultures: ["Linear Pottery (LBK)", "Vinča Culture"],
+    highFrequencyModern: ["Sardinia (8%)", "Central Europe (5-8%)", "Levant (4%)"],
+    migrationPath: [
+      { order: 1, region: "Anatolia to Balkans", timePeriod: "9,000 BP", description: "Neolithic agricultural dispersal." }
+    ]
+  },
+  // ── H3
+  {
+    code: "H3",
+    shortName: "H3 (Atlantic / Iberian)",
+    cladeName: "mtDNA-H3",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "H",
+    definingSnps: ["6776C"],
+    ageYearsBp: "~11,000 BP",
+    originRegion: "Iberia / Western Mediterranean",
+    historicalDescription: "Second most common H branch in Western Europe, especially enriched in the Basque Country and Sardinia.",
+    ancientCultures: ["Cardial Pottery", "Nuragic Sardinia", "Atlantic Bronze Age"],
+    highFrequencyModern: ["Sardinia (18%)", "Basques (14%)", "Portugal (12%)", "Ireland (10%)"],
+    migrationPath: [
+      { order: 1, region: "Iberia & Western Mediterranean", timePeriod: "11,000 BP", description: "Maritime and coastal foraging and early pastoralism." }
+    ]
+  },
+  // ── V: Post-LGM Iberian / Scandinavian
+  {
+    code: "V",
+    shortName: "Haplogroup V (Post-LGM Iberian / Scandinavian)",
+    cladeName: "mtDNA-V",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "HV",
+    definingSnps: ["4580A", "15904T"],
+    ageYearsBp: "~15,000 BP",
+    originRegion: "Iberia / Southwest France (Glacial Refuge)",
+    historicalDescription: "Associated with post-Last Glacial Maximum re-colonization of Scandinavia and northern Europe from the Iberian refugium. Particularly common in the Saami and Basques.",
+    ancientCultures: ["Magdalenian Ice Age Survivors", "Post-Glacial Scandinavian Recolonizers"],
+    highFrequencyModern: ["Saami (42%)", "Basques (10%)", "Norway (7%)", "Finland (5%)", "Spain (5%)"],
+    migrationPath: [
+      { order: 1, region: "Franco-Cantabrian Refuge", timePeriod: "15,000 BP", description: "Survival in Iberian ice-age refugium." },
+      { order: 2, region: "Scandinavia & Baltic", timePeriod: "10,000 BP", description: "Post-glacial rapid northward expansion colonizing deglaciated Scandinavia." }
+    ]
+  },
+  // ── W: South Asian / European N subclade
+  {
+    code: "W",
+    shortName: "Haplogroup W (South Asian / NE European)",
+    cladeName: "mtDNA-W",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["8994A", "7472T"],
+    ageYearsBp: "~25,000 BP",
+    originRegion: "South Asia / West Asia",
+    historicalDescription: "Found in South Asia and at lower frequencies in the Near East and Eastern Europe. Represents an ancient N-derived lineage that entered South Asia from West Asia.",
+    ancientCultures: ["Early South Asian Foragers"],
+    highFrequencyModern: ["Pakistan / NW India (5-10%)", "Caucasus (4%)", "NE Europe (3%)"],
+    migrationPath: [
+      { order: 1, region: "West Asia / South Asia", timePeriod: "25,000 BP", description: "W expansion through the Iranian Plateau into the Indian subcontinent." }
+    ]
+  },
+  // ── I: Northern European / Saami-associated
+  {
+    code: "I",
+    shortName: "Haplogroup I (Northern European Relic)",
+    cladeName: "mtDNA-I",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["10034C"],
+    ageYearsBp: "~30,000 BP",
+    originRegion: "Near East / Eastern Europe",
+    historicalDescription: "An ancient N subclade found at low frequency across Europe. Associated with early European hunter-gatherers and remnant Near Eastern populations.",
+    ancientCultures: ["Gravettian Hunter-Gatherers"],
+    highFrequencyModern: ["Northern Europe 1-3%", "Near East (2%)", "Saami (5%)"],
+    migrationPath: [
+      { order: 1, region: "Near East to Eastern Europe", timePeriod: "25,000 BP", description: "Westward spread of I with early European hunter-gatherers." }
+    ]
+  },
+  // ── U: Upper Paleolithic European Hunter-Gatherer root
+  {
+    code: "U",
+    shortName: "Haplogroup U (Ancient Hunter-Gatherer)",
+    cladeName: "mtDNA-U",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["12308G", "12372A", "mt1811"],
+    ageYearsBp: "~45,000 BP",
+    originRegion: "Near East / Europe",
+    historicalDescription: "One of the oldest maternal lineages in Europe. Subclade U5 was the dominant maternal lineage of Western European Mesolithic hunter-gatherers (WHG).",
+    ancientCultures: ["Aurignacian", "Gravettian", "Western Hunter-Gatherers (WHG)", "Cheddar Man"],
+    highFrequencyModern: ["Scandinavia (U5 in Saami ~50%)", "Baltic States (15-20%)", "Caucasus (U4/U7)", "India (U2/U7)"],
+    migrationPath: [
+      { order: 1, region: "Balkans & Western Europe", timePeriod: "45,000 BP", description: "Upper Paleolithic colonization of ice-age Europe." }
+    ]
+  },
+  // ── U2: South Asian subclade
+  {
+    code: "U2",
+    shortName: "Haplogroup U2 (South Asian)",
+    cladeName: "mtDNA-U2",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U",
+    definingSnps: ["1811G"],
+    ageYearsBp: "~35,000 BP",
+    originRegion: "South Asia / Subcontinent",
+    historicalDescription: "Primarily found in South Asia (India, Pakistan), thought to represent a very early migration from the Near East into the Indian subcontinent.",
+    ancientCultures: ["Early Indian Subcontinent Foragers"],
+    highFrequencyModern: ["India (5-10%)", "Pakistan (5%)", "Bangladesh (4%)"],
+    migrationPath: [
+      { order: 1, region: "Near East to Subcontinent", timePeriod: "35,000 BP", description: "U2 colonization of South Asia." }
+    ]
+  },
+  // ── U3: Middle East / Caucasus
+  {
+    code: "U3",
+    shortName: "Haplogroup U3 (Middle East / Caucasus)",
+    cladeName: "mtDNA-U3",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U",
+    definingSnps: ["14577C"],
+    ageYearsBp: "~22,000 BP",
+    originRegion: "Near East / Caucasus / Eastern Mediterranean",
+    historicalDescription: "Present across the Caucasus, Near East, and Eastern Mediterranean. Traces to early Near Eastern populations.",
+    ancientCultures: ["Epipaleolithic Levant"],
+    highFrequencyModern: ["Caucasus (5%)", "Iran (4%)", "Turkey (3%)", "SE Europe (3%)"],
+    migrationPath: [
+      { order: 1, region: "Near East / Caucasus", timePeriod: "22,000 BP", description: "U3 spread across the Caucasus and Eastern Mediterranean." }
+    ]
+  },
+  // ── U4: Northeast European / Central Asian
+  {
+    code: "U4",
+    shortName: "Haplogroup U4 (Northeast European / Steppe)",
+    cladeName: "mtDNA-U4",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U",
+    definingSnps: ["4646C"],
+    ageYearsBp: "~25,000 BP",
+    originRegion: "Northeast Europe / Central Asia",
+    historicalDescription: "Found in Northeast European and Central Asian populations. Detected in Bronze Age Yamnaya steppe pastoralists.",
+    ancientCultures: ["Yamnaya Steppe Pastoralists", "Corded Ware"],
+    highFrequencyModern: ["Russia / Northern Europe (5%)", "Central Asia (4%)", "Finland (3%)"],
+    migrationPath: [
+      { order: 1, region: "NE Europe / Ural Region", timePeriod: "15,000 BP", description: "U4 spread across Northern Eurasia and Bronze Age steppe." }
+    ]
+  },
+  // ── U5 (intermediate before U5b)
+  {
+    code: "U5",
+    shortName: "Haplogroup U5 (WHG Ancestor)",
+    cladeName: "mtDNA-U5",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U",
+    definingSnps: ["3197C"],
+    ageYearsBp: "~30,000 BP",
+    originRegion: "Europe (Pre-LGM)",
+    historicalDescription: "The Mesolithic European maternal clade dominating Western European hunter-gatherers before the Neolithic farming transition. Required intermediate before classifying U5b.",
+    ancientCultures: ["Pre-LGM European Hunter-Gatherers"],
+    highFrequencyModern: ["Ancestral to U5a and U5b subclades"],
+    migrationPath: [
+      { order: 1, region: "Europe", timePeriod: "30,000 BP", description: "U5 establishing dominance across Ice Age Europe." }
+    ]
+  },
+  // ── U5b: Cheddar Man / WHG
+  {
+    code: "U5b",
+    shortName: "U5b (Mesolithic European Hunter-Gatherer)",
+    cladeName: "mtDNA-U5b",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U5",
+    definingSnps: ["7768G", "16270T", "mt14182", "mt150"],
+    ageYearsBp: "~22,000 BP",
+    originRegion: "Southwestern Europe (Franco-Cantabrian Ice Age Refuge)",
+    historicalDescription: "Iconic maternal lineage of post-glacial European hunter-gatherers, found in Cheddar Man and ancient burials across France, Spain, and Britain.",
+    ancientCultures: ["Magdalenian", "Azilian", "Mesolithic Britain / Cheddar Man"],
+    highFrequencyModern: ["Saami of Lapland (50%)", "Basques (15%)", "Finns (10%)", "Northern & Western Europe (8-12%)"],
+    migrationPath: [
+      { order: 1, region: "Franco-Cantabrian Caves", timePeriod: "20,000 BP", description: "Survival through the Last Glacial Maximum." },
+      { order: 2, region: "Deglaciated Northern Europe", timePeriod: "11,000 BP", description: "Pioneering recolonization of Britain, Scandinavia, and the Baltic." }
+    ]
+  },
+  // ── U7: Iran / Arabian Peninsula
+  {
+    code: "U7",
+    shortName: "Haplogroup U7 (Iran / Arabia / South Asia)",
+    cladeName: "mtDNA-U7",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "U",
+    definingSnps: ["5999C"],
+    ageYearsBp: "~18,000 BP",
+    originRegion: "Iran / Arabian Peninsula",
+    historicalDescription: "Found across Iran, the Arabian Peninsula, and India. Traces to early populations in the Iranian Plateau and Arabian refugia during the Last Glacial Maximum.",
+    ancientCultures: ["Arabian Peninsula Foragers", "Iranian Plateau Early Populations"],
+    highFrequencyModern: ["Iran (5%)", "Pakistan (4%)", "UAE / Arabia (4%)"],
+    migrationPath: [
+      { order: 1, region: "Iranian Plateau / Arabian Gulf", timePeriod: "18,000 BP", description: "U7 expansion from Persian Gulf refugia." }
+    ]
+  },
+  // ── J1c: Neolithic Farming Expansion (Jasmine)
+  {
+    code: "J1c",
+    shortName: "J1c (Jasmine — Neolithic Farming Expansion)",
+    cladeName: "mtDNA-J1c",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["14798C", "16069T", "mt185", "mt295", "mt462"],
+    ageYearsBp: "~15,000 BP",
+    originRegion: "Near East / Fertile Crescent",
+    historicalDescription: "Carried across Europe by early Neolithic farmers bringing agriculture, pottery, and animal husbandry into Central and Northern Europe.",
+    ancientCultures: ["Linear Pottery (LBK)", "Starčevo–Körös", "Ancient Near Eastern Agronomists"],
+    highFrequencyModern: ["Central Europe (8-12%)", "British Isles (8%)", "Scandinavia (7%)", "Near East (10%)"],
+    migrationPath: [
+      { order: 1, region: "Fertile Crescent", timePeriod: "12,000 BP", description: "Domestication of emmer wheat and goats." },
+      { order: 2, region: "Danube River Valley", timePeriod: "7,500 BP", description: "Rapid spread of LBK farming across Western and Northern Europe." }
+    ]
+  },
+  // ── T2: Yamnaya & Neolithic Steppe / Agrarian (Tara)
+  {
+    code: "T2",
+    shortName: "T2 (Tara — Steppe & Neolithic Agrarian)",
+    cladeName: "mtDNA-T2",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["8697A", "16126C", "mt709", "mt1888", "mt10463"],
+    ageYearsBp: "~16,000 BP",
+    originRegion: "Near East / Caucasus / Pontic Steppe",
+    historicalDescription: "Associated with both the Neolithic agricultural diffusion and subsequent Bronze Age Yamnaya steppe pastoralist migrations.",
+    ancientCultures: ["Yamnaya", "Corded Ware", "Neolithic Farmers"],
+    highFrequencyModern: ["Eastern Europe (8-10%)", "Scandinavia (7%)", "Italy (6%)", "Iran / Levant (8%)"],
+    migrationPath: [
+      { order: 1, region: "Caucasus / Steppe", timePeriod: "10,000 BP", description: "Pastoralist adaptations." },
+      { order: 2, region: "Northern & Eastern Europe", timePeriod: "5,000 BP", description: "Steppe expansions associated with Indo-European languages." }
+    ]
+  },
+  // ── K1a: Ötzi / Cardial Mediterranean / Ashkenazi (Katrine)
+  {
+    code: "K1a",
+    shortName: "K1a (Katrine — Ötzi & Cardial Mediterranean)",
+    cladeName: "mtDNA-K1a",
+    lineageType: "MATERNAL_MTDNA",
+    parentClade: "N",
+    definingSnps: ["9055A", "10550G", "mt497", "mt1189"],
+    ageYearsBp: "~16,000 BP",
+    originRegion: "Near East / Anatolia / Mediterranean",
+    historicalDescription: "Key marker of early European farmers and ancient Alpine populations. Ötzi the Iceman had an extinct subclade of K1 (K1f).",
+    ancientCultures: ["Ötzi the Iceman", "Cardial Ware", "Levantine Early Farmers", "Ashkenazi Matriarchs"],
+    highFrequencyModern: ["Ashkenazi Jewish (32%)", "Alps / Tyrol (8-10%)", "Cyprus (10%)", "Levant (8%)"],
+    migrationPath: [
+      { order: 1, region: "Levant & Anatolia", timePeriod: "15,000 BP", description: "Epipaleolithic origins." },
+      { order: 2, region: "Mediterranean Basin & Alps", timePeriod: "8,000 BP", description: "Neolithic maritime migration to Italy, Spain, and Central Europe." }
+    ]
+  },
+  // ── A2: Indigenous American Founder
   {
     code: "A2",
     shortName: "Haplogroup A2 (Indigenous American Founder)",
     cladeName: "mtDNA-A2",
     lineageType: "MATERNAL_MTDNA",
     parentClade: "N",
-    definingSnps: ["mt663", "mt1736", "mt4248", "mt4824", "mt8794", "rs2853505", "rs2853520"],
+    definingSnps: ["663G", "8794T", "mt1736", "mt4248", "mt4824"],
     ageYearsBp: "~16,000 BP",
     originRegion: "Beringia / Siberia",
     historicalDescription: "One of the five founding maternal lineages (A2, B2, C1, D1, X2a) of Indigenous American peoples.",

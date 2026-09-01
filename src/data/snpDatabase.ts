@@ -55,51 +55,125 @@ export const ALL_DEFINING_SNPS: SnpMarker[] = [
   { name: "DF27", rsid: "rs16980479", chromosome: "Y", position: 18850000, ancestralAllele: "C", derivedAllele: "T", haplogroup: "R1b-DF27", lineageType: "PATERNAL_YDNA", description: "Iberian / Celtiberian / Basque marker" },
 
   // ==========================================
-  // MTDNA SNPS (Mitochondrial Genome)
+  // MTDNA SNPS (Mitochondrial Genome — PhyloTree Build 17 / rCRS)
   // ==========================================
-  // Root / L clades
-  { name: "769A", rsid: "rs2853493", chromosome: "MT", position: 769, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3", lineageType: "MATERNAL_MTDNA", description: "Mitochondrial Out of Africa marker" },
-  { name: "1018A", rsid: "rs2853494", chromosome: "MT", position: 1018, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3", lineageType: "MATERNAL_MTDNA", description: "L3 defining marker" },
-  { name: "3594T", rsid: "rs2853495", chromosome: "MT", position: 3594, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L3", lineageType: "MATERNAL_MTDNA", description: "Maternal Out of Africa stem" },
-  { name: "16278T", rsid: "rs2853496", chromosome: "MT", position: 16278, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L2", lineageType: "MATERNAL_MTDNA", description: "West African L2 marker" },
 
-  // Macrohaplogroup M & N
-  { name: "489C", rsid: "rs2853497", chromosome: "MT", position: 489, ancestralAllele: "T", derivedAllele: "C", haplogroup: "M", lineageType: "MATERNAL_MTDNA", description: "Macrohaplogroup M founder marker" },
-  { name: "10400T", rsid: "rs2853498", chromosome: "MT", position: 10400, ancestralAllele: "C", derivedAllele: "T", haplogroup: "M", lineageType: "MATERNAL_MTDNA", description: "Asian / South Asian M marker" },
-  { name: "8701G", rsid: "rs2853491", chromosome: "MT", position: 8701, ancestralAllele: "A", derivedAllele: "G", haplogroup: "N", lineageType: "MATERNAL_MTDNA", description: "Macrohaplogroup N Eurasian founder" },
-  { name: "10398G", rsid: "rs2853492", chromosome: "MT", position: 10398, ancestralAllele: "A", derivedAllele: "G", haplogroup: "N", lineageType: "MATERNAL_MTDNA", description: "Major Eurasian division marker" },
+  // ── L0: Deepest Root (Khoisan / Mitochondrial Eve)
+  { name: "146C",   rsid: "rs41349744", chromosome: "MT", position: 146,   ancestralAllele: "A", derivedAllele: "C", haplogroup: "L0",   lineageType: "MATERNAL_MTDNA", description: "Basal L0 marker — distinguishes L0 from L1/L2/L3/L4/L5/L6. Khoisan hunter-gatherer lineage." },
+  { name: "16129A", rsid: "rs28358575", chromosome: "MT", position: 16129, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L0",   lineageType: "MATERNAL_MTDNA", description: "Secondary L0 HVR diagnostic. Key in L0a and L0k subclades." },
 
-  // Haplogroup U & U5b
-  { name: "12308G", rsid: "rs2853510", chromosome: "MT", position: 12308, ancestralAllele: "A", derivedAllele: "G", haplogroup: "U", lineageType: "MATERNAL_MTDNA", description: "Haplogroup U Upper Paleolithic marker" },
-  { name: "12372A", rsid: "rs2853511", chromosome: "MT", position: 12372, ancestralAllele: "G", derivedAllele: "A", haplogroup: "U", lineageType: "MATERNAL_MTDNA", description: "U clade defining marker" },
-  { name: "7768G", rsid: "rs2853512", chromosome: "MT", position: 7768, ancestralAllele: "A", derivedAllele: "G", haplogroup: "U5b", lineageType: "MATERNAL_MTDNA", description: "European Mesolithic Hunter-Gatherer U5b marker" },
-  { name: "16270T", rsid: "rs2853513", chromosome: "MT", position: 16270, ancestralAllele: "C", derivedAllele: "T", haplogroup: "U5b", lineageType: "MATERNAL_MTDNA", description: "Cheddar Man / WHG marker" },
+  // ── L1: Central / West African basal clade
+  { name: "3666A",  rsid: "rs28358178", chromosome: "MT", position: 3666,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L1",   lineageType: "MATERNAL_MTDNA", description: "Defines L1 (L1b, L1c, L1d, L1k). Differentiates from L0 and L2/L3." },
+  { name: "7055A",  rsid: "rs28358179", chromosome: "MT", position: 7055,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L1",   lineageType: "MATERNAL_MTDNA", description: "Coding-region confirmation marker for L1." },
 
-  // Haplogroup H (Helena) and Subclades
-  { name: "2706G", rsid: "rs2853499", chromosome: "MT", position: 2706, ancestralAllele: "A", derivedAllele: "G", haplogroup: "H", lineageType: "MATERNAL_MTDNA", description: "Haplogroup H defining base (Helena)" },
-  { name: "7028C", rsid: "rs28358280", chromosome: "MT", position: 7028, ancestralAllele: "T", derivedAllele: "C", haplogroup: "H", lineageType: "MATERNAL_MTDNA", description: "Primary diagnostic marker for Haplogroup H" },
-  { name: "3010A", rsid: "rs28358281", chromosome: "MT", position: 3010, ancestralAllele: "G", derivedAllele: "A", haplogroup: "H1", lineageType: "MATERNAL_MTDNA", description: "Western European Franco-Cantabrian H1 marker" },
-  { name: "16189C", rsid: "rs2853515", chromosome: "MT", position: 16189, ancestralAllele: "T", derivedAllele: "C", haplogroup: "H1", lineageType: "MATERNAL_MTDNA", description: "H1 post-glacial expansion marker" },
-  { name: "1438A", rsid: "rs2853500", chromosome: "MT", position: 1438, ancestralAllele: "G", derivedAllele: "A", haplogroup: "H2", lineageType: "MATERNAL_MTDNA", description: "Central European Neolithic H2 marker" },
-  { name: "6776C", rsid: "rs28358282", chromosome: "MT", position: 6776, ancestralAllele: "T", derivedAllele: "C", haplogroup: "H3", lineageType: "MATERNAL_MTDNA", description: "Iberian & Sardinian H3 marker" },
+  // ── L2 / L2a / L2a1: West African & African-American dominant maternal lines
+  { name: "13590A", rsid: "rs28358196", chromosome: "MT", position: 13590, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L2",   lineageType: "MATERNAL_MTDNA", description: "Basal L2 coding-region marker. Use with 16278T to confirm L2." },
+  { name: "15950G", rsid: "rs28358197", chromosome: "MT", position: 15950, ancestralAllele: "A", derivedAllele: "G", haplogroup: "L2a",  lineageType: "MATERNAL_MTDNA", description: "Defines L2a — the most common L2 subclade in West Africa and African Americans." },
+  // NOTE: 3594T was previously (incorrectly) assigned to L3. Per PhyloTree Build 17, it defines L2a1.
+  { name: "3594T",  rsid: "rs2853495",  chromosome: "MT", position: 3594,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "L2a1", lineageType: "MATERNAL_MTDNA", description: "Defines L2a1 (a major L2a subclade prevalent in West Africa). Previously mislabelled L3 — corrected." },
+  { name: "16278T", rsid: "rs2853496",  chromosome: "MT", position: 16278, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L2",   lineageType: "MATERNAL_MTDNA", description: "HVR West African L2 hint marker. Always pair with coding-region 13590A to confirm." },
 
-  // Haplogroup J1c
-  { name: "14798C", rsid: "rs2853501", chromosome: "MT", position: 14798, ancestralAllele: "T", derivedAllele: "C", haplogroup: "J1c", lineageType: "MATERNAL_MTDNA", description: "Neolithic Farmer J1c marker" },
-  { name: "16069T", rsid: "rs2853516", chromosome: "MT", position: 16069, ancestralAllele: "C", derivedAllele: "T", haplogroup: "J1c", lineageType: "MATERNAL_MTDNA", description: "Early Agronomist maternal line" },
+  // ── L3: Out of Africa maternal ancestor
+  { name: "769A",   rsid: "rs2853493",  chromosome: "MT", position: 769,   ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3",   lineageType: "MATERNAL_MTDNA", description: "Mitochondrial Out of Africa marker — L3 basal." },
+  { name: "1018A",  rsid: "rs2853494",  chromosome: "MT", position: 1018,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3",   lineageType: "MATERNAL_MTDNA", description: "L3 defining coding-region marker." },
 
-  // Haplogroup T2
-  { name: "8697A", rsid: "rs2853503", chromosome: "MT", position: 8697, ancestralAllele: "G", derivedAllele: "A", haplogroup: "T2", lineageType: "MATERNAL_MTDNA", description: "Yamnaya & Neolithic T2 marker" },
-  { name: "16126C", rsid: "rs2853517", chromosome: "MT", position: 16126, ancestralAllele: "T", derivedAllele: "C", haplogroup: "T2", lineageType: "MATERNAL_MTDNA", description: "Tara maternal clade marker" },
+  // ── Macrohaplogroup M: South & East Asian + Indigenous American ancestor
+  { name: "489C",   rsid: "rs2853497",  chromosome: "MT", position: 489,   ancestralAllele: "T", derivedAllele: "C", haplogroup: "M",    lineageType: "MATERNAL_MTDNA", description: "Macrohaplogroup M primary founder marker." },
+  { name: "10400T", rsid: "rs2853498",  chromosome: "MT", position: 10400, ancestralAllele: "C", derivedAllele: "T", haplogroup: "M",    lineageType: "MATERNAL_MTDNA", description: "Asian / South Asian M coding-region marker." },
+  { name: "16311C", rsid: "rs28358312", chromosome: "MT", position: 16311, ancestralAllele: "T", derivedAllele: "C", haplogroup: "M",    lineageType: "MATERNAL_MTDNA", description: "Common M HVR marker — highly recurrent. Only valid when paired with 489C + 10400T." },
 
-  // Haplogroup K1a
-  { name: "9055A", rsid: "rs2853502", chromosome: "MT", position: 9055, ancestralAllele: "G", derivedAllele: "A", haplogroup: "K1a", lineageType: "MATERNAL_MTDNA", description: "Alpine / Cardial Mediterranean Ötzi marker" },
-  { name: "10550G", rsid: "rs2853518", chromosome: "MT", position: 10550, ancestralAllele: "A", derivedAllele: "G", haplogroup: "K1a", lineageType: "MATERNAL_MTDNA", description: "Katrine subclade marker" },
+  // ── M7: Japan / East Asia subclade
+  { name: "4312C",  rsid: "rs28358313", chromosome: "MT", position: 4312,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "M7",   lineageType: "MATERNAL_MTDNA", description: "Defines M7 (prevalent in Japan and East Asia). Discriminates from D/C/Z." },
 
-  // Haplogroup D4
-  { name: "8414T", rsid: "rs2853504", chromosome: "MT", position: 8414, ancestralAllele: "C", derivedAllele: "T", haplogroup: "D4", lineageType: "MATERNAL_MTDNA", description: "East Asian / Siberian D4 marker" },
-  { name: "14668T", rsid: "rs2853519", chromosome: "MT", position: 14668, ancestralAllele: "C", derivedAllele: "T", haplogroup: "D4", lineageType: "MATERNAL_MTDNA", description: "Northern East Asian diagnostic base" },
+  // ── M8: Ancestor of C and Z (Siberia / Americas)
+  { name: "9824C",  rsid: "rs28358314", chromosome: "MT", position: 9824,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "M8",   lineageType: "MATERNAL_MTDNA", description: "Defines M8 — direct ancestor of haplogroups C and Z. Critical for C/Z separation." },
 
-  // Haplogroup A2
-  { name: "663G", rsid: "rs2853505", chromosome: "MT", position: 663, ancestralAllele: "A", derivedAllele: "G", haplogroup: "A2", lineageType: "MATERNAL_MTDNA", description: "Indigenous American A2 founder marker" },
-  { name: "8794T", rsid: "rs2853520", chromosome: "MT", position: 8794, ancestralAllele: "C", derivedAllele: "T", haplogroup: "A2", lineageType: "MATERNAL_MTDNA", description: "Beringian expansion marker" }
+  // ── M9: Ancestor of E and haplogroup Q
+  { name: "4715C",  rsid: "rs28358315", chromosome: "MT", position: 4715,  ancestralAllele: "A", derivedAllele: "C", haplogroup: "M9",   lineageType: "MATERNAL_MTDNA", description: "Defines M9 — ancestor to haplogroup E and Q-branch subclades." },
+
+  // ── Haplogroup C: Siberian / Native American founding lineage
+  { name: "13263G", rsid: "rs28358316", chromosome: "MT", position: 13263, ancestralAllele: "A", derivedAllele: "G", haplogroup: "C",    lineageType: "MATERNAL_MTDNA", description: "Primary C defining marker. Always use with M8 marker 9824C for confirmation." },
+  { name: "11969A", rsid: "rs28358317", chromosome: "MT", position: 11969, ancestralAllele: "G", derivedAllele: "A", haplogroup: "C",    lineageType: "MATERNAL_MTDNA", description: "Secondary C marker (C1 subclade)." },
+
+  // ── Haplogroup Z: Siberian / Manchu / NE Asia
+  { name: "15784C", rsid: "rs28358318", chromosome: "MT", position: 15784, ancestralAllele: "T", derivedAllele: "C", haplogroup: "Z",    lineageType: "MATERNAL_MTDNA", description: "Defines Z — distinguishes from sibling clade C. Use with M8 marker 9824C." },
+
+  // ── Haplogroup D (basal): Siberian / East Asian root of D4 and D5
+  { name: "2092C",  rsid: "rs28358319", chromosome: "MT", position: 2092,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "D",    lineageType: "MATERNAL_MTDNA", description: "Basal D root marker. Necessary to classify D* and D5 — your D4 markers alone miss these branches." },
+  { name: "4883T",  rsid: "rs28358320", chromosome: "MT", position: 4883,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "D",    lineageType: "MATERNAL_MTDNA", description: "Second basal D marker to confirm D-root classification." },
+
+  // ── D4: East Asian / Siberian subclade (existing + retained)
+  { name: "8414T",  rsid: "rs2853504",  chromosome: "MT", position: 8414,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "D4",   lineageType: "MATERNAL_MTDNA", description: "D4 subclade marker — Jomon Japan, Northern Han Chinese, Mongolians." },
+  { name: "14668T", rsid: "rs2853519",  chromosome: "MT", position: 14668, ancestralAllele: "C", derivedAllele: "T", haplogroup: "D4",   lineageType: "MATERNAL_MTDNA", description: "D4 coding-region diagnostic base — Northern East Asian." },
+
+  // ── Macrohaplogroup N: Eurasian root
+  { name: "8701G",  rsid: "rs2853491",  chromosome: "MT", position: 8701,  ancestralAllele: "A", derivedAllele: "G", haplogroup: "N",    lineageType: "MATERNAL_MTDNA", description: "Macrohaplogroup N Eurasian founder marker." },
+  { name: "10398G", rsid: "rs2853492",  chromosome: "MT", position: 10398, ancestralAllele: "A", derivedAllele: "G", haplogroup: "N",    lineageType: "MATERNAL_MTDNA", description: "N division marker — unstable, always pair with 8701G; back-mutation risk." },
+  { name: "150C",   rsid: "rs28358321", chromosome: "MT", position: 150,   ancestralAllele: "T", derivedAllele: "C", haplogroup: "N",    lineageType: "MATERNAL_MTDNA", description: "Basal N HVR marker — recurrent, use only in context with coding-region N markers." },
+  { name: "10238C", rsid: "rs28358322", chromosome: "MT", position: 10238, ancestralAllele: "T", derivedAllele: "C", haplogroup: "N",    lineageType: "MATERNAL_MTDNA", description: "Basal N coding-region marker — more robust than 150C for N classification." },
+
+  // ── Haplogroup X: Native American X2a + European relic
+  { name: "6371T",  rsid: "rs28358323", chromosome: "MT", position: 6371,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "X",    lineageType: "MATERNAL_MTDNA", description: "Primary X defining marker. X is often mislabelled as U or N* without this." },
+  { name: "14470C", rsid: "rs28358324", chromosome: "MT", position: 14470, ancestralAllele: "T", derivedAllele: "C", haplogroup: "X",    lineageType: "MATERNAL_MTDNA", description: "Secondary X confirmation marker." },
+
+  // ── HV: Ancestral clade to H and V (critical missing link)
+  { name: "14766C", rsid: "rs28358325", chromosome: "MT", position: 14766, ancestralAllele: "T", derivedAllele: "C", haplogroup: "HV",   lineageType: "MATERNAL_MTDNA", description: "Defines HV — basal ancestor of both H and V. Critical root node for correct H/V classification." },
+
+  // ── Haplogroup H (Helena) and Subclades
+  { name: "2706G",  rsid: "rs2853499",  chromosome: "MT", position: 2706,  ancestralAllele: "A", derivedAllele: "G", haplogroup: "H",    lineageType: "MATERNAL_MTDNA", description: "H defining marker (Helena) — most common European maternal lineage." },
+  { name: "7028C",  rsid: "rs28358280", chromosome: "MT", position: 7028,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "H",    lineageType: "MATERNAL_MTDNA", description: "Primary diagnostic for Haplogroup H — H-specific derived state." },
+  { name: "3010A",  rsid: "rs28358281", chromosome: "MT", position: 3010,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "H1",   lineageType: "MATERNAL_MTDNA", description: "H1 primary marker — Western European Franco-Cantabrian expansion." },
+  { name: "16189C", rsid: "rs2853515",  chromosome: "MT", position: 16189, ancestralAllele: "T", derivedAllele: "C", haplogroup: "H1",   lineageType: "MATERNAL_MTDNA", description: "H1 HVR marker — poly-C hotspot; unreliable alone. Always use with coding marker 3010A." },
+  { name: "1438A",  rsid: "rs2853500",  chromosome: "MT", position: 1438,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "H2",   lineageType: "MATERNAL_MTDNA", description: "H2 Central European Neolithic marker." },
+  { name: "6776C",  rsid: "rs28358282", chromosome: "MT", position: 6776,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "H3",   lineageType: "MATERNAL_MTDNA", description: "H3 marker — Iberian & Sardinian Atlantic lineage." },
+
+  // ── Haplogroup V: Post-LGM Iberian / Scandinavian
+  { name: "4580A",  rsid: "rs28358326", chromosome: "MT", position: 4580,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "V",    lineageType: "MATERNAL_MTDNA", description: "Primary V defining marker — critical to separate V from H post-LGM Iberian expansion." },
+  { name: "15904T", rsid: "rs28358327", chromosome: "MT", position: 15904, ancestralAllele: "C", derivedAllele: "T", haplogroup: "V",    lineageType: "MATERNAL_MTDNA", description: "Secondary V confirmation marker." },
+
+  // ── Haplogroup W: South Asian / European N subclade
+  { name: "8994A",  rsid: "rs28358328", chromosome: "MT", position: 8994,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "W",    lineageType: "MATERNAL_MTDNA", description: "Primary W defining marker — separates W from I and N*. Found in South Asia and NE Europe." },
+  { name: "7472T",  rsid: "rs28358329", chromosome: "MT", position: 7472,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "W",    lineageType: "MATERNAL_MTDNA", description: "Secondary W coding-region confirmation marker." },
+
+  // ── Haplogroup I: Northern European / Saami-associated N subclade
+  { name: "10034C", rsid: "rs28358330", chromosome: "MT", position: 10034, ancestralAllele: "T", derivedAllele: "C", haplogroup: "I",    lineageType: "MATERNAL_MTDNA", description: "Primary I defining marker — often confused with W due to shared ancestry. Saami / Northern European." },
+
+  // ── Haplogroup U: Upper Paleolithic European hunter-gatherers
+  { name: "12308G", rsid: "rs2853510",  chromosome: "MT", position: 12308, ancestralAllele: "A", derivedAllele: "G", haplogroup: "U",    lineageType: "MATERNAL_MTDNA", description: "U root marker — Upper Paleolithic European hunter-gatherer." },
+  { name: "12372A", rsid: "rs2853511",  chromosome: "MT", position: 12372, ancestralAllele: "G", derivedAllele: "A", haplogroup: "U",    lineageType: "MATERNAL_MTDNA", description: "Secondary U defining marker." },
+
+  // ── U5 intermediate (needed before U5b)
+  { name: "3197C",  rsid: "rs28358331", chromosome: "MT", position: 3197,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "U5",   lineageType: "MATERNAL_MTDNA", description: "U5 intermediate marker — required before declaring U5b. Ancestral to WHG Mesolithic lineages." },
+
+  // ── U5b: Cheddar Man / Western Hunter-Gatherer
+  { name: "7768G",  rsid: "rs2853512",  chromosome: "MT", position: 7768,  ancestralAllele: "A", derivedAllele: "G", haplogroup: "U5b",  lineageType: "MATERNAL_MTDNA", description: "U5b derived marker — Cheddar Man / WHG Mesolithic Europe." },
+  { name: "16270T", rsid: "rs2853513",  chromosome: "MT", position: 16270, ancestralAllele: "C", derivedAllele: "T", haplogroup: "U5b",  lineageType: "MATERNAL_MTDNA", description: "U5b HVR marker — Cheddar Man / WHG." },
+
+  // ── U2: South Asian subclade
+  { name: "1811G",  rsid: "rs28358332", chromosome: "MT", position: 1811,  ancestralAllele: "A", derivedAllele: "G", haplogroup: "U2",   lineageType: "MATERNAL_MTDNA", description: "Defines U2 — prominent in South Asia (India ~5-10%). Absent in most commercial kits." },
+
+  // ── U3: Middle East / Caucasus subclade
+  { name: "14577C", rsid: "rs28358333", chromosome: "MT", position: 14577, ancestralAllele: "A", derivedAllele: "C", haplogroup: "U3",   lineageType: "MATERNAL_MTDNA", description: "Defines U3 — Middle East, Caucasus, Eastern Mediterranean." },
+
+  // ── U4: Northeast European / Central Asian subclade
+  { name: "4646C",  rsid: "rs28358334", chromosome: "MT", position: 4646,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "U4",   lineageType: "MATERNAL_MTDNA", description: "Defines U4 — Northeast Europe and Central Asia. Found in Bronze Age steppe populations." },
+
+  // ── U7: Iran / Arabian Peninsula / South Asian subclade
+  { name: "5999C",  rsid: "rs28358335", chromosome: "MT", position: 5999,  ancestralAllele: "T", derivedAllele: "C", haplogroup: "U7",   lineageType: "MATERNAL_MTDNA", description: "Defines U7 — Iran, Arabian Peninsula, and Indian subcontinent." },
+
+  // ── J1c: Neolithic Farming Expansion (Jasmine)
+  { name: "14798C", rsid: "rs2853501",  chromosome: "MT", position: 14798, ancestralAllele: "T", derivedAllele: "C", haplogroup: "J1c",  lineageType: "MATERNAL_MTDNA", description: "J1c Neolithic Farmer primary marker." },
+  { name: "16069T", rsid: "rs2853516",  chromosome: "MT", position: 16069, ancestralAllele: "C", derivedAllele: "T", haplogroup: "J1c",  lineageType: "MATERNAL_MTDNA", description: "J1c Early Agronomist maternal HVR marker." },
+
+  // ── T2: Yamnaya & Neolithic Steppe / Agrarian (Tara)
+  { name: "8697A",  rsid: "rs2853503",  chromosome: "MT", position: 8697,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "T2",   lineageType: "MATERNAL_MTDNA", description: "T2 primary coding-region marker — Yamnaya steppe & Neolithic agrarian." },
+  { name: "16126C", rsid: "rs2853517",  chromosome: "MT", position: 16126, ancestralAllele: "T", derivedAllele: "C", haplogroup: "T2",   lineageType: "MATERNAL_MTDNA", description: "T2 HVR Tara clade marker." },
+
+  // ── K1a: Ötzi / Cardial Mediterranean / Ashkenazi (Katrine)
+  { name: "9055A",  rsid: "rs2853502",  chromosome: "MT", position: 9055,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "K1a",  lineageType: "MATERNAL_MTDNA", description: "K1a primary marker — Ötzi the Iceman / Alpine Cardial Mediterranean." },
+  { name: "10550G", rsid: "rs2853518",  chromosome: "MT", position: 10550, ancestralAllele: "A", derivedAllele: "G", haplogroup: "K1a",  lineageType: "MATERNAL_MTDNA", description: "K1a secondary coding-region marker." },
+
+  // ── A2: Indigenous American Founder (Beringia / Clovis)
+  { name: "663G",   rsid: "rs2853505",  chromosome: "MT", position: 663,   ancestralAllele: "A", derivedAllele: "G", haplogroup: "A2",   lineageType: "MATERNAL_MTDNA", description: "A2 primary marker — Indigenous American Beringian founder. Walk N→A→A2 hierarchically." },
+  { name: "8794T",  rsid: "rs2853520",  chromosome: "MT", position: 8794,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "A2",   lineageType: "MATERNAL_MTDNA", description: "A2 Beringian expansion confirmation marker." }
 ];
