@@ -8,11 +8,13 @@ import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
   onReset: () => void;
+  onExploreTree?: (lineage: LineageType) => void;
 }
 
 export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
   result,
-  onReset
+  onReset,
+  onExploreTree
 }) => {
   const [activeLineage, setActiveLineage] = useState<LineageType>('PATERNAL_YDNA');
   const [markerSearch, setMarkerSearch] = useState('');
@@ -220,11 +222,22 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
 
           {/* Phylogenetic Lineage Path */}
           <div className="bento-card p-6 space-y-3">
-            <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                Phylogenetic Tree Traversal Path
-              </h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Compass className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  Phylogenetic Tree Traversal Path
+                </h3>
+              </div>
+              {onExploreTree && (
+                <button
+                  onClick={() => onExploreTree(activeLineage)}
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Explore on Full Tree</span>
+                </button>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1">

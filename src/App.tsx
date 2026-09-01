@@ -4,6 +4,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { AnalysisResultScreen } from './components/AnalysisResultScreen';
 import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
+import { PhylogeneticTreeViewer } from './components/PhylogeneticTreeViewer';
 import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
@@ -29,66 +30,93 @@ export const App: React.FC = () => {
       const kits = await getAllSavedKits();
       setSavedKits(kits);
     } catch (e) {
-      console.error('Failed to load saved kits:', e);
+      console.warn('Failed to fetch saved kits from IndexedDB:', e);
     }
   };
 
-  const runWorkerAnalysis = (payload: { file?: File; rawText?: string; kitName: string }) => {
+  const handleFileUpload = (file: File) => {
     setIsProcessing(true);
-    setProcessingProgress(5);
-    setProcessingMessage('Initializing Web Worker...');
+    setProcessingProgress(0);
+    setProcessingMessage('Initializing bioinformatics worker...');
 
-    const worker = new Worker(new URL('./workers/dnaWorker.ts', import.meta.url), { type: 'module' });
+    const worker = new Worker(new URL('./workers/dnaWorker.ts', import.meta.url), {
+      type: 'module'
+    });
 
-    worker.onmessage = async (e: MessageEvent) => {
-      const data = e.data;
-      if (data.type === 'PROGRESS') {
-        setProcessingProgress(data.progress);
-        setProcessingMessage(data.message);
-      } else if (data.type === 'SUCCESS') {
-        const result: DnaAnalysisResult = data.result;
+    worker.onmessage = async (e) => {
+      const { type, progress, message, result, error } = e.data;
+
+      if (type === 'PROGRESS') {
+        if (progress !== undefined) setProcessingProgress(progress);
+        if (message) setProcessingMessage(message);
+      } else if (type === 'SUCCESS' && result) {
+        setIsProcessing(false);
         setActiveResult(result);
         await saveAnalysisResult(result);
         await loadSavedKits();
-        setIsProcessing(false);
         setCurrentTab('result');
         worker.terminate();
-      } else if (data.type === 'ERROR') {
-        alert(`Analysis error: ${data.message}`);
+      } else if (type === 'ERROR') {
         setIsProcessing(false);
+        alert(`Analysis failed: ${error}`);
         worker.terminate();
       }
     };
 
     worker.onerror = (err) => {
-      console.error('Worker error:', err);
-      alert('An error occurred during genetic analysis in the Web Worker.');
       setIsProcessing(false);
+      alert(`Worker error: ${err.message}`);
       worker.terminate();
     };
 
     worker.postMessage({
-      type: 'ANALYZE_DNA',
-      ...payload
+      type: 'PARSE_FILE',
+      file,
+      fileName: file.name
     });
-  };
-
-  const handleFileUpload = (file: File) => {
-    const kitName = file.name.replace(/\.[^/.]+$/, '');
-    runWorkerAnalysis({ file, kitName });
   };
 
   const handleRawTextSubmit = (rawText: string, kitName: string) => {
-    runWorkerAnalysis({ rawText, kitName: kitName || 'Custom DNA Sample' });
+    setIsProcessing(true);
+    setProcessingProgress(0);
+    setProcessingMessage('Initializing analysis worker...');
+
+    const worker = new Worker(new URL('./workers/dnaWorker.ts', import.meta.url), {
+      type: 'module'
+    });
+
+    worker.onmessage = async (e) => {
+      const { type, progress, message, result, error } = e.data;
+
+      if (type === 'PROGRESS') {
+        if (progress !== undefined) setProcessingProgress(progress);
+        if (message) setProcessingMessage(message);
+      } else if (type === 'SUCCESS' && result) {
+        setIsProcessing(false);
+        setActiveResult(result);
+        await saveAnalysisResult(result);
+        await loadSavedKits();
+        setCurrentTab('result');
+        worker.terminate();
+      } else if (type === 'ERROR') {
+        setIsProcessing(false);
+        alert(`Analysis failed: ${error}`);
+        worker.terminate();
+      }
+    };
+
+    worker.postMessage({
+      type: 'PARSE_TEXT',
+      text: rawText,
+      fileName: kitName
+    });
   };
 
-  const handleSelectSampleKit = (kitId: string) => {
-    const sample = SAMPLE_DNA_KITS.find(s => s.id === kitId);
+  const handleSelectSampleKit = (kitKey: string) => {
+    const sample = SAMPLE_DNA_KITS.find(k => k.id === kitKey);
     if (!sample) return;
-    runWorkerAnalysis({
-      rawText: sample.rawSnippetContent,
-      kitName: sample.title
-    });
+
+    handleRawTextSubmit(sample.rawSnippetContent, sample.title);
   };
 
   const handleSelectSavedKit = (kit: DnaAnalysisResult) => {
@@ -139,6 +167,13 @@ export const App: React.FC = () => {
           <AnalysisResultScreen
             result={activeResult}
             onReset={() => setCurrentTab('home')}
+            onExploreTree={() => setCurrentTab('tree')}
+          />
+        )}
+
+        {currentTab === 'tree' && (
+          <PhylogeneticTreeViewer
+            activeResult={activeResult}
           />
         )}
 

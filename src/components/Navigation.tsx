@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { forceClearCacheAndReload } from '../utils/storage';
 
-export type NavTab = 'home' | 'result' | 'comparison' | 'encyclopedia';
+export type NavTab = 'home' | 'result' | 'tree' | 'comparison' | 'encyclopedia';
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -127,6 +127,18 @@ export const Navigation: React.FC<NavigationProps> = ({
               <span>Lineage</span>
             </button>
           )}
+
+          <button
+            onClick={() => onSelectTab('tree')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              currentTab === 'tree'
+                ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/30'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Phylo-Tree</span>
+          </button>
 
           <button
             onClick={() => onSelectTab('comparison')}
