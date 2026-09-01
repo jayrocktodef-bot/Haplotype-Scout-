@@ -14,6 +14,8 @@ import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
 import { SAMPLE_DNA_KITS } from './data/sampleDnaKits';
 import { Heart, ExternalLink, GitBranch, ShieldCheck, Compass, Sparkles, Activity, Dna, Database } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
@@ -407,6 +409,10 @@ export const App: React.FC = () => {
         isOpen={showDonationModal}
         onClose={() => setShowDonationModal(false)}
       />
+
+      {/* Vercel Web Analytics & Performance Telemetry */}
+      <Analytics />
+      <SpeedInsights />
 
     </div>
   );
