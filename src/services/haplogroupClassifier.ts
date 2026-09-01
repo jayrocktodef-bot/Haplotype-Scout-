@@ -1,6 +1,7 @@
 import { ALL_DEFINING_SNPS } from '../data/snpDatabase';
 import { Y_DNA_HAPLOGROUPS, MT_DNA_HAPLOGROUPS } from '../data/haplogroupTree';
 import { DIAGNOSTIC_LD_PROXIES } from '../data/ldProxies';
+import { snpAliasResolver } from '../data/snpAliasIndex';
 import { ParsedDnaData } from './dnaParser';
 import {
   DnaAnalysisResult,
@@ -58,7 +59,23 @@ export class HaplogroupClassifier {
       const rsidKey = snp.rsid.toLowerCase();
       const posKey = `${snp.chromosome.toLowerCase()}:${snp.position}`;
 
-      let userGenotype = parsedData.snpByRsid[rsidKey] || parsedData.snpByPosition[posKey] || '--';
+      let userGenotype = parsedData.snpByRsid[rsidKey] || parsedData.snpByPosition[posKey];
+
+      // Multi-Vendor Alias Resolution: Check synonymous rsIDs, P-markers, CTS-numbers if uncalled
+      if (!userGenotype || userGenotype === '--') {
+        const aliasEntry = snpAliasResolver.resolveName(snp.name) || snpAliasResolver.resolveName(snp.rsid);
+        if (aliasEntry) {
+          for (const alias of aliasEntry.aliases) {
+            const val = parsedData.snpByRsid[alias.toLowerCase()];
+            if (val && val !== '--' && val !== '00' && val !== '??') {
+              userGenotype = val;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!userGenotype) userGenotype = '--';
       let isImputed = false;
       let imputedFrom = undefined;
 
