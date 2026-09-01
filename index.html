@@ -1,23 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Haplotype Scout - Paternal & Maternal Deep Lineage</title>
     
-    <!-- PWA & Mobile Meta Tags -->
-    <meta name="theme-color" content="#090d16" />
+    <!-- Primary SEO & Title -->
+    <title>Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier</title>
+    <meta name="title" content="Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Haplogroup Classifier" />
+    <meta name="description" content="100% private, client-side Y-DNA & mtDNA deep lineage haplogroup classifier with DAG tree walking, ISOGG Y-Tree radix navigation, Build 17 transversion weighting, and microhaplotype block phasing." />
+    <meta name="keywords" content="Haplogroup Classifier, Y-DNA haplogroup, mtDNA haplogroup, Phylogeny, Microhaplotypes, ISOGG, PhyloTree Build 17, DNA Lineage, Raw DNA analyzer, 23andMe haplogroups, AncestryDNA haplogroup, Written In The Genome" />
+    <meta name="author" content="Written In The Genome" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    
+    <!-- Google Site Verification & Ads / Givebutter -->
+    <meta name="google-site-verification" content="xjJA1beGsZi7Xz0_k4xvDoWwCywC06WZusnk0fKIXaM" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6734186229480105" crossorigin="anonymous"></script>
+    <script async src="https://widgets.givebutter.com/latest.umd.cjs?acct=vIWtSmp0ILaaJM6I&p=other"></script>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://haplotype.writteninthegenome.blog/" />
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Written In The Genome Genomics Tools" />
+    <meta property="og:url" content="https://haplotype.writteninthegenome.blog/" />
+    <meta property="og:title" content="Haplotype Scout — Deep Y-DNA & mtDNA Lineage Mapping" />
+    <meta property="og:description" content="Analyze your raw DNA with DAG ancestral negative guarding, LD proxy imputation, and 100-block microhaplotype deconvolution. 100% in-browser." />
+    <meta property="og:image" content="https://writteninthegenome.blog/wp-content/uploads/2026/04/17762177921467E26841384755661462607.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Cards -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:site" content="@jayrocktodef" />
+    <meta property="twitter:creator" content="@jayrocktodef" />
+    <meta property="twitter:url" content="https://haplotype.writteninthegenome.blog/" />
+    <meta property="twitter:title" content="Haplotype Scout — State-of-the-Art Y-DNA & mtDNA Classifier" />
+    <meta property="twitter:description" content="100% private, client-side Y-DNA & mtDNA deep lineage haplogroup classifier with ISOGG DAG tree walking and Build 17 transversion weighting." />
+    <meta property="twitter:image" content="https://writteninthegenome.blog/wp-content/uploads/2026/04/17762177921467E26841384755661462607.jpg" />
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/webp" href="https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp" />
+    <link rel="apple-touch-icon" href="https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp" />
+
+    <!-- PWA & Mobile Settings -->
+    <meta name="theme-color" content="#080c14" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Haplotype Scout" />
-    <meta name="description" content="100% Private, On-Device Raw DNA Y-DNA & mtDNA Haplogroup Classifier & Phylogeny Explorer" />
-    
-    <!-- Google Fonts Inter & JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- JSON-LD Structured Data Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://haplotype.writteninthegenome.blog/#webapp",
+          "url": "https://haplotype.writteninthegenome.blog/",
+          "name": "Haplotype Scout",
+          "applicationCategory": "ScientificApplication",
+          "operatingSystem": "All (Web Browser, PWA)",
+          "browserRequirements": "Requires JavaScript. Requires Web Workers & Web Crypto API.",
+          "description": "High-accuracy, 100% in-browser Y-DNA & mtDNA haplogroup classifier with DAG tree walking, ISOGG Y-Tree navigation, Van Oven PhyloTree Build 17 engine, and microhaplotype block phasing.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Written In The Genome",
+            "url": "https://writteninthegenome.blog",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp"
+            }
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://writteninthegenome.blog/#website",
+          "url": "https://writteninthegenome.blog/",
+          "name": "Written In The Genome",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Written In The Genome",
+            "url": "https://writteninthegenome.blog"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
-  <body class="bg-[#090d16] text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden min-h-screen">
+  <body class="bg-[#080c14] text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden min-h-screen">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

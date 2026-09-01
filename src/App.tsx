@@ -8,7 +8,7 @@ import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
 import { getAllSavedKits, saveAnalysisResult, deleteSavedKit } from './utils/storage';
 import { SAMPLE_DNA_KITS } from './data/sampleDnaKits';
-import { Heart, ExternalLink, GitBranch, Sparkles, BookOpen, ShieldCheck, Dna } from 'lucide-react';
+import { Heart, ExternalLink, GitBranch, ShieldCheck, Compass, Sparkles, Activity } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
@@ -109,7 +109,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-slate-100 flex flex-col selection:bg-teal-500/30 selection:text-teal-200">
+    <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
       
       {/* Top Header Navigation */}
       <Navigation
@@ -154,8 +154,8 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Rich Footer with Branding & Ecosystem Links */}
-      <footer className="border-t border-white/[0.08] py-12 px-4 sm:px-6 bg-[#09090b]/90 backdrop-blur-xl mt-12">
+      {/* Rich Footer with Branding & Cross-Tool Integration */}
+      <footer className="border-t border-white/[0.08] py-12 px-4 sm:px-6 bg-[#080c14]/90 backdrop-blur-xl mt-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
           
           {/* Brand Col */}
@@ -164,18 +164,18 @@ export const App: React.FC = () => {
               <img
                 src="https://writteninthegenome.blog/wp-content/uploads/2026/03/cropped-1000055020-e1773637919503.webp"
                 alt="Written In The Genome"
-                className="w-7 h-7 rounded-lg ring-1 ring-teal-500/30 object-cover"
+                className="w-7 h-7 rounded-lg ring-1 ring-cyan-500/30 object-cover"
                 onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
-              <span className="text-base font-black text-white">Written In The Genome</span>
+              <span className="text-base font-extrabold text-white">Written In The Genome</span>
             </div>
             <p className="text-xs text-slate-400 max-w-md leading-relaxed">
-              Pioneering private, client-side bioinformatics tools and publishing independent genomic research exploring ancient DNA, population genetics, and human history.
+              Pioneering private, client-side bioinformatics tools and publishing independent genomic research exploring ancient DNA, population genetics, and deep phylogenetic history.
             </p>
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => setShowDonationModal(true)}
-                className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 to-rose-500/15 text-amber-300 hover:from-amber-500/25 hover:to-rose-500/25 border border-amber-500/30 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/15 to-rose-500/15 text-amber-300 hover:from-amber-500/25 hover:to-rose-500/25 border border-amber-500/30 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
                 <span>Support Our Research</span>
@@ -192,7 +192,7 @@ export const App: React.FC = () => {
                   href="https://writteninthegenome.blog"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                  className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
                 >
                   <span>Main Blog Home</span>
                   <ExternalLink className="w-3 h-3 opacity-60" />
@@ -203,7 +203,7 @@ export const App: React.FC = () => {
                   href="https://writteninthegenome.blog/dispatches-archives/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                  className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
                 >
                   <span>Dispatches Archive</span>
                   <ExternalLink className="w-3 h-3 opacity-60" />
@@ -214,7 +214,7 @@ export const App: React.FC = () => {
                   href="https://writteninthegenome.blog/sources-research-library/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                  className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
                 >
                   <span>Sources &amp; Research Library</span>
                   <ExternalLink className="w-3 h-3 opacity-60" />
@@ -223,19 +223,29 @@ export const App: React.FC = () => {
             </ul>
           </div>
 
-          {/* Ecosystem Projects */}
+          {/* Suite & Cross-Tool Integration */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Genomic Ecosystem</h4>
+            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Genomic Suite Tools</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <a
-                  href="https://github.com/jayrocktodef-bot/WITG-Genotype-Scout"
+                  href="https://scout.writteninthegenome.blog"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                  className="text-slate-300 hover:text-cyan-400 font-semibold transition-colors flex items-center gap-1.5"
                 >
-                  <span>Genotype Scout</span>
+                  <Activity className="w-3.5 h-3.5 text-teal-400" />
+                  <span>Genotype Scout (Ancestry &amp; Health)</span>
                   <ExternalLink className="w-3 h-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://haplotype.writteninthegenome.blog"
+                  className="text-cyan-400 font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Haplotype Scout (Y &amp; mtDNA Studio)</span>
                 </a>
               </li>
               <li>
@@ -243,15 +253,15 @@ export const App: React.FC = () => {
                   href="https://github.com/jayrocktodef-bot/Haplotype-Scout-"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-teal-400 transition-colors flex items-center gap-1"
+                  className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
                 >
-                  <span>Haplotype Scout Repository</span>
                   <GitBranch className="w-3 h-3 opacity-60" />
+                  <span>Open Source Engine (GitHub)</span>
                 </a>
               </li>
               <li className="pt-1">
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-bold">
-                  <ShieldCheck className="w-3.5 h-3.5" /> 100% Offline &amp; Private
+                  <ShieldCheck className="w-3.5 h-3.5" /> 100% Offline &amp; Zero-Upload
                 </span>
               </li>
             </ul>
