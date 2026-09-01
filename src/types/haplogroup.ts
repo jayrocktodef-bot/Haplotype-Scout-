@@ -70,6 +70,27 @@ export interface MicroHapResult {
   percentage: number;
 }
 
+export interface ArchaicLocusMatch {
+  rsid: string;
+  gene?: string;
+  hominin: 'NEANDERTHAL' | 'DENISOVAN' | 'BOTH';
+  traitOrFunction: string;
+  userGenotype: string;
+  archaicAllele: string;
+  isDerivedMatch: boolean;
+  modernFrequencyPct: string;
+}
+
+export interface ArchaicAffinityResult {
+  neanderthalPercentage: number;     // e.g. 1.85%
+  denisovanPercentage: number;       // e.g. 0.12%
+  neanderthalVariantCount: number;
+  denisovanVariantCount: number;
+  totalInformativeTested: number;
+  globalPercentile: number;          // e.g. 74th percentile
+  functionalLoci: ArchaicLocusMatch[];
+}
+
 export interface DnaAnalysisResult {
   id: string;
   kitName: string;
@@ -81,6 +102,7 @@ export interface DnaAnalysisResult {
   paternalLineage: LineageAnalysis | null;
   maternalLineage: LineageAnalysis | null;
   microhaplotypes?: MicroHapResult[];
+  archaicAffinity?: ArchaicAffinityResult;
   isMaleSample: boolean;
 }
 

@@ -4,6 +4,7 @@ import {
   MapPin, Clock, Users, ArrowRight, Compass, Filter
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
+import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -137,6 +138,11 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Archaic DNA Introgression & Hominin Affinity Bento Card */}
+      {result.archaicAffinity && (
+        <ArchaicIntrogressionCard archaicData={result.archaicAffinity} />
       )}
 
       {/* Lineage Analysis Details */}

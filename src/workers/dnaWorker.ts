@@ -110,6 +110,17 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       console.warn('Microhaplotype resolution skipped:', e);
     }
 
+    // 3. Archaic DNA Introgression & Hominin Affinity Deconvolution
+    try {
+      const { calculateArchaicAffinity } = await import('../services/archaicEngine');
+      result.archaicAffinity = calculateArchaicAffinity(
+        parsedData.snpByRsid,
+        parsedData.snpByPosition
+      );
+    } catch (e) {
+      console.warn('Archaic affinity calculation skipped:', e);
+    }
+
     self.postMessage({
       type: 'SUCCESS',
       result
