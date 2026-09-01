@@ -5,7 +5,6 @@ import {
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
-import { AncientSampleMatcher } from './AncientSampleMatcher';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -109,50 +108,7 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
         </div>
       </div>
 
-      {/* Microhaplotype Phased Ancestry Bento Card */}
-      {result.microhaplotypes && result.microhaplotypes.length > 0 && (
-        <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Microhaplotype Phased Affinity
-              </h3>
-            </div>
-            <span className="text-xs text-slate-400 font-mono">100-Block Phased Kernel</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {result.microhaplotypes.map((hap) => (
-              <div key={hap.popCode} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-200">{hap.name}</span>
-                  <span className="font-mono font-bold text-cyan-300">{hap.percentage}%</span>
-                </div>
-                <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
-                  <div 
-                    className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full"
-                    style={{ width: `${hap.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Archaic DNA Introgression & Hominin Affinity Bento Card */}
-      {result.archaicAffinity && (
-        <ArchaicIntrogressionCard archaicData={result.archaicAffinity} />
-      )}
-
-      {/* Ancient Archaeological Sample Matcher Bento Card */}
-      <AncientSampleMatcher
-        paternalHaplo={result.paternalLineage?.terminalHaplogroup}
-        maternalHaplo={result.maternalLineage?.terminalHaplogroup}
-      />
-
-      {/* Lineage Analysis Details */}
+      {/* Lineage Analysis Details (Haplogroups First) */}
       {currentAnalysis ? (
         <div className="space-y-6">
           
@@ -179,26 +135,37 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
                   </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                   {currentAnalysis.terminalHaplogroup.historicalDescription}
                 </p>
               </div>
 
+
               {/* Metrics */}
-              <div className="flex md:flex-col gap-2.5 shrink-0">
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-center min-w-[110px]">
-                  <span className="block text-[10px] text-slate-400 uppercase font-semibold">Derived</span>
-                  <span className="text-lg font-extrabold text-emerald-400 font-mono">
-                    {currentAnalysis.positiveCount}
-                  </span>
+              <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-2 border-t sm:border-t-0 sm:border-l border-white/[0.08] pt-4 sm:pt-0 sm:pl-6 shrink-0">
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase">Estimated Age</span>
+                  <div className="text-sm font-extrabold font-mono text-amber-300">
+                    {currentAnalysis.terminalHaplogroup.ageYearsBp}
+                  </div>
                 </div>
 
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-center min-w-[110px]">
-                  <span className="block text-[10px] text-slate-400 uppercase font-semibold">Ancestral</span>
-                  <span className="text-lg font-extrabold text-slate-400 font-mono">
-                    {currentAnalysis.negativeCount}
-                  </span>
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase">Origin Focus</span>
+                  <div className="text-xs font-semibold text-slate-200">
+                    {currentAnalysis.terminalHaplogroup.originRegion}
+                  </div>
                 </div>
+
+                {onExploreTree && (
+                  <button
+                    onClick={() => onExploreTree(activeLineage)}
+                    className="mt-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Explore on Tree</span>
+                  </button>
+                )}
               </div>
 
             </div>
@@ -388,6 +355,43 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
           <p className="text-sm text-slate-400">
             No diagnostic markers available for this lineage type in the uploaded raw DNA file.
           </p>
+        </div>
+      )}
+
+      {/* Archaic DNA Introgression & Hominin Affinity Bento Card */}
+      {result.archaicAffinity && (
+        <ArchaicIntrogressionCard archaicData={result.archaicAffinity} />
+      )}
+
+      {/* Microhaplotype Phased Ancestry Bento Card */}
+      {result.microhaplotypes && result.microhaplotypes.length > 0 && (
+        <div className="bento-card p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Microhaplotype Phased Affinity
+              </h3>
+            </div>
+            <span className="text-xs text-slate-400 font-mono">100-Block Phased Kernel</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {result.microhaplotypes.map((hap) => (
+              <div key={hap.popCode} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-200">{hap.name}</span>
+                  <span className="font-mono font-bold text-cyan-300">{hap.percentage}%</span>
+                </div>
+                <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                  <div 
+                    className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full"
+                    style={{ width: `${hap.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

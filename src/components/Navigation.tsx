@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Compass, ExternalLink, ShieldCheck, Heart, 
-  RefreshCw, Layers, GitCompare, Home, GitBranch, BookOpen
+  RefreshCw, Layers, GitCompare, Home, GitBranch, BookOpen, Landmark
 } from 'lucide-react';
 import { forceClearCacheAndReload } from '../utils/storage';
 
-export type NavTab = 'home' | 'result' | 'tree' | 'comparison' | 'encyclopedia';
+export type NavTab = 'home' | 'result' | 'ancient' | 'tree' | 'comparison' | 'encyclopedia';
 
 interface NavigationProps {
   currentTab: NavTab;
@@ -124,9 +124,21 @@ export const Navigation: React.FC<NavigationProps> = ({
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Lineage</span>
+              <span>Haplogroups</span>
             </button>
           )}
+
+          <button
+            onClick={() => onSelectTab('ancient')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              currentTab === 'ancient'
+                ? 'bg-cyan-500 text-slate-950 shadow-sm shadow-cyan-500/30'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Landmark className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Ancient DNA</span>
+          </button>
 
           <button
             onClick={() => onSelectTab('tree')}

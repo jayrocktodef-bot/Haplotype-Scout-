@@ -5,6 +5,7 @@ import { AnalysisResultScreen } from './components/AnalysisResultScreen';
 import { ComparisonScreen } from './components/ComparisonScreen';
 import { EncyclopediaScreen } from './components/EncyclopediaScreen';
 import { PhylogeneticTreeViewer } from './components/PhylogeneticTreeViewer';
+import { AncientSampleMatcher } from './components/AncientSampleMatcher';
 import { BetaNoticeModal } from './components/BetaNoticeModal';
 import { DonationModal } from './components/DonationModal';
 import { DnaAnalysisResult } from './types/haplogroup';
@@ -191,6 +192,13 @@ export const App: React.FC = () => {
             result={activeResult}
             onReset={() => setCurrentTab('home')}
             onExploreTree={() => setCurrentTab('tree')}
+          />
+        )}
+
+        {currentTab === 'ancient' && (
+          <AncientSampleMatcher
+            paternalHaplo={activeResult?.paternalLineage?.terminalHaplogroup}
+            maternalHaplo={activeResult?.maternalLineage?.terminalHaplogroup}
           />
         )}
 
