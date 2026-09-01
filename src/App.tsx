@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Navigation, NavTab } from './components/Navigation';
 import { HomeScreen } from './components/HomeScreen';
 import { AnalysisResultScreen } from './components/AnalysisResultScreen';
@@ -407,6 +408,9 @@ export const App: React.FC = () => {
         isOpen={showDonationModal}
         onClose={() => setShowDonationModal(false)}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
 
     </div>
   );
