@@ -141,6 +141,39 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
         </div>
       </div>
 
+      {/* Microhaplotype Deconvolution Section (from Genotype Scout) */}
+      {result.microhaplotypes && result.microhaplotypes.length > 0 && (
+        <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <h3 className="text-base sm:text-lg font-bold text-white">Microhaplotype Phased Ancestry</h3>
+            </div>
+            <span className="text-xs text-slate-400 font-mono">Top 100 Multi-SNP Haplotype Blocks</span>
+          </div>
+          <p className="text-xs text-slate-400">
+            Reconstructed short-range phased haplotypes indicating fine-scale genetic affinity across reference continental populations.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+            {result.microhaplotypes.map((hap) => (
+              <div key={hap.popCode} className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-200">{hap.name}</span>
+                  <span className="font-mono font-bold text-cyan-300">{hap.percentage}%</span>
+                </div>
+                <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                  <div 
+                    className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full"
+                    style={{ width: `${hap.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Lineage Core Details */}
       {currentAnalysis ? (
         <div className="space-y-8">

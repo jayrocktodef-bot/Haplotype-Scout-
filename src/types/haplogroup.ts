@@ -61,6 +61,12 @@ export interface LineageAnalysis {
   novelOrUntestedMarkers?: string[];
 }
 
+export interface MicroHapResult {
+  popCode: string;
+  name: string;
+  percentage: number;
+}
+
 export interface DnaAnalysisResult {
   id: string;
   kitName: string;
@@ -71,6 +77,7 @@ export interface DnaAnalysisResult {
   mtDnaSnpsCount: number;
   paternalLineage: LineageAnalysis | null;
   maternalLineage: LineageAnalysis | null;
+  microhaplotypes?: MicroHapResult[];
   isMaleSample: boolean;
 }
 
@@ -83,3 +90,4 @@ export interface SampleDnaKit {
   maternalHaplo: string;
   rawSnippetContent: string;
 }
+

@@ -65,9 +65,21 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       });
     });
 
-    self.postMessage({ type: 'PROGRESS', progress: 90, message: 'Evaluating Y-DNA & mtDNA phylogenies...' });
+    self.postMessage({ type: 'PROGRESS', progress: 85, message: 'Evaluating Y-DNA & mtDNA phylogenies...' });
 
     const result = HaplogroupClassifier.analyze(kitName, parsedData);
+
+    // Microhaplotype Deconvolution (if microhap kernel is present)
+    try {
+      const response = await fetch('/data/microhap_kernel.json');
+      if (response.ok) {
+        const kernel = await response.json();
+        const { deconvolveMicrohaplotypes } = await import('../services/microhapEngine');
+        result.microhaplotypes = deconvolveMicrohaplotypes(parsedData.snpByRsid, kernel);
+      }
+    } catch (e) {
+      console.warn('Microhaplotype resolution skipped:', e);
+    }
 
     self.postMessage({
       type: 'SUCCESS',
