@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { DnaAnalysisResult, LineageType } from '../types/haplogroup';
 import { ArchaicIntrogressionCard } from './ArchaicIntrogressionCard';
+import { AncientSampleMatcher } from './AncientSampleMatcher';
 
 interface AnalysisResultScreenProps {
   result: DnaAnalysisResult;
@@ -144,6 +145,12 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
       {result.archaicAffinity && (
         <ArchaicIntrogressionCard archaicData={result.archaicAffinity} />
       )}
+
+      {/* Ancient Archaeological Sample Matcher Bento Card */}
+      <AncientSampleMatcher
+        paternalHaplo={result.paternalLineage?.terminalHaplogroup}
+        maternalHaplo={result.maternalLineage?.terminalHaplogroup}
+      />
 
       {/* Lineage Analysis Details */}
       {currentAnalysis ? (
