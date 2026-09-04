@@ -53,6 +53,11 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 uppercase">
               {result.rawFileFormat} Profile
             </span>
+            {result.detectedBuild && (
+              <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase">
+                {result.detectedBuild} Reference
+              </span>
+            )}
             <span className="text-xs text-slate-400 font-mono">
               {result.totalSnpsParsed.toLocaleString()} Loci Analyzed
             </span>
@@ -69,6 +74,33 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
         >
           Load Different Sample
         </button>
+      </div>
+
+      {/* Signal Integrity & Calibration Diagnostic Ribbon */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-slate-900/40 border border-white/[0.06] text-xs font-mono text-slate-400">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1.5 text-slate-300 font-bold">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            Signal Integrity Engine:
+          </span>
+          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[10px]">
+            Palindromic Guard
+          </span>
+          <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px]">
+            NUMT Masking
+          </span>
+          <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30 text-[10px]">
+            Homoplasy Filter
+          </span>
+          <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 text-[10px]">
+            Platform Noise Guard
+          </span>
+        </div>
+        {result.paternalLineage?.phase2Details?.inferredBiologicalSex && (
+          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold">
+            Sex Profile: {result.paternalLineage.phase2Details.inferredBiologicalSex === 'FEMALE' ? 'Female (XX)' : 'Male (XY)'}
+          </span>
+        )}
       </div>
 
       {/* Lineage Tab Selector */}
@@ -137,6 +169,32 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
                     ({currentAnalysis.terminalHaplogroup.cladeName})
                   </span>
                 </div>
+
+                {currentAnalysis.phase2Details && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>ISOGG Phase 2 Traversal ({currentAnalysis.phase2Details.coverage}% Defining Loci Covered)</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900 border border-slate-700/60 text-slate-300">
+                      {currentAnalysis.phase2Details.derivedSnpCount} Derived Markers
+                    </span>
+                    {currentAnalysis.phase2Details.rejectedBranches.length > 0 && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-950/50 border border-rose-800/40 text-rose-300">
+                        {currentAnalysis.phase2Details.rejectedBranches.length} Sibling Branches Pruned
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {!currentAnalysis.phase2Details && currentAnalysis.coverage !== undefined && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                      <span>PhyloTree Build 17 Refined ({currentAnalysis.coverage}% Coverage)</span>
+                    </span>
+                  </div>
+                )}
 
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                   {currentAnalysis.terminalHaplogroup.historicalDescription}
@@ -231,29 +289,52 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              {currentAnalysis.lineageTreePath.map((node, index) => {
-                const isTerminal = index === currentAnalysis.lineageTreePath.length - 1;
-                return (
-                  <React.Fragment key={node.code}>
-                    <div
-                      className={`px-3 py-1 rounded-lg border text-xs font-mono transition-all ${
-                        isTerminal
-                          ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/20'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-300'
-                      }`}
-                    >
-                      <span>{node.code}</span>
-                      {!isTerminal && (
-                        <span className="text-[10px] text-slate-500 ml-1">({node.shortName})</span>
-                      )}
-                    </div>
+              {currentAnalysis.phase2Details?.path && currentAnalysis.phase2Details.path.length > 0 ? (
+                currentAnalysis.phase2Details.path.map((node, index) => {
+                  const isTerminal = index === currentAnalysis.phase2Details!.path.length - 1;
+                  return (
+                    <React.Fragment key={node}>
+                      <div
+                        className={`px-3 py-1 rounded-lg border text-xs font-mono transition-all ${
+                          isTerminal
+                            ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/20'
+                            : 'bg-slate-950/60 border-slate-800 text-slate-300'
+                        }`}
+                      >
+                        <span>{node}</span>
+                      </div>
 
-                    {!isTerminal && (
-                      <ArrowRight className="w-3 h-3 text-slate-600 shrink-0" />
-                    )}
-                  </React.Fragment>
-                );
-              })}
+                      {!isTerminal && (
+                        <ArrowRight className="w-3 h-3 text-slate-600 shrink-0" />
+                      )}
+                    </React.Fragment>
+                  );
+                })
+              ) : (
+                currentAnalysis.lineageTreePath.map((node, index) => {
+                  const isTerminal = index === currentAnalysis.lineageTreePath.length - 1;
+                  return (
+                    <React.Fragment key={node.code}>
+                      <div
+                        className={`px-3 py-1 rounded-lg border text-xs font-mono transition-all ${
+                          isTerminal
+                            ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/20'
+                            : 'bg-slate-950/60 border-slate-800 text-slate-300'
+                        }`}
+                      >
+                        <span>{node.code}</span>
+                        {!isTerminal && (
+                          <span className="text-[10px] text-slate-500 ml-1">({node.shortName})</span>
+                        )}
+                      </div>
+
+                      {!isTerminal && (
+                        <ArrowRight className="w-3 h-3 text-slate-600 shrink-0" />
+                      )}
+                    </React.Fragment>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -263,6 +344,7 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
             evaluatedMarkers={currentAnalysis.evaluatedMarkers}
             lineageType={activeLineage}
             novelOrUntestedMarkers={currentAnalysis.novelOrUntestedMarkers}
+            phase2Details={currentAnalysis.phase2Details}
           />
 
           {/* 📜 Patrilineal Surname & Y-STR Forensic Guide (Paternal Y-DNA Only) */}

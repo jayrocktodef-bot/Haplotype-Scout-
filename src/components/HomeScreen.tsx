@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { 
   Upload, Sparkles, FileText, Lock, Zap, Clock, Globe, 
-  ArrowRight, Trash2, Cpu, Compass, CheckCircle2, Binary, ChevronRight,
+  ArrowRight, Trash2, Compass, CheckCircle2, Binary, ChevronRight,
   ChevronDown, ChevronUp
 } from 'lucide-react';
 import { SAMPLE_DNA_KITS } from '../data/sampleDnaKits';
@@ -220,7 +220,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Saved Profiles & Engine Telemetry */}
+        {/* Right Column: Saved Profiles */}
         <div className="space-y-6">
           
           {/* Saved Profiles */}
@@ -272,33 +272,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Engine Specs */}
-          <div className="bento-card p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-indigo-400" />
-              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Engine Specs</h3>
-            </div>
-            
-            <div className="space-y-2 text-xs text-slate-300">
-              <div className="flex justify-between py-1 border-b border-white/[0.04]">
-                <span className="text-slate-400">Y-Tree Architecture:</span>
-                <span className="font-mono text-cyan-300">ISOGG DAG Radix</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-white/[0.04]">
-                <span className="text-slate-400">mtDNA Reference:</span>
-                <span className="font-mono text-cyan-300">PhyloTree Build 17</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-white/[0.04]">
-                <span className="text-slate-400">Imputation Linkage:</span>
-                <span className="font-mono text-cyan-300">$r^2 \ge 0.95$ Proxies</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-slate-400">Worker Isolation:</span>
-                <span className="font-mono text-emerald-400">Dedicated Thread</span>
-              </div>
-            </div>
           </div>
 
         </div>

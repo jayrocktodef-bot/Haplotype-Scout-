@@ -1,4 +1,5 @@
 import { LineageAnalysis } from '../types/haplogroup';
+import { isPotentialNumtLocus } from '../utils/genomicMasks';
 
 export interface PhylotreeMutation {
   position: number;
@@ -7,6 +8,7 @@ export interface PhylotreeMutation {
   rawString: string;
   isTransversion: boolean;
   isHotspot: boolean;
+  isNumtProne: boolean;
   weight: number;
 }
 
@@ -38,10 +40,14 @@ export function parseMtMutation(raw: string): PhylotreeMutation | null {
                          (ancestral === 'C' && derived === 'T') || (ancestral === 'T' && derived === 'C');
 
     const isHotspot = MTDNA_MUTATION_HOTSPOTS.has(pos);
+    const isNumtProne = isPotentialNumtLocus(pos);
 
     let weight = isTransition ? 1.0 : 4.5;
     if (isHotspot) {
       weight *= 0.35; // Dampen hypervariable mutational hotspots
+    }
+    if (isNumtProne) {
+      weight *= 0.65; // Protect against autosomal NUMT pseudogene cross-hybridization
     }
 
     return {
@@ -51,6 +57,7 @@ export function parseMtMutation(raw: string): PhylotreeMutation | null {
       rawString: raw,
       isTransversion: !isTransition,
       isHotspot,
+      isNumtProne,
       weight
     };
   }
@@ -60,6 +67,7 @@ export function parseMtMutation(raw: string): PhylotreeMutation | null {
   if (indelMatch) {
     const pos = parseInt(indelMatch[1], 10);
     const isHotspot = MTDNA_MUTATION_HOTSPOTS.has(pos);
+    const isNumtProne = isPotentialNumtLocus(pos);
     return {
       position: pos,
       ancestral: '-',
@@ -67,7 +75,8 @@ export function parseMtMutation(raw: string): PhylotreeMutation | null {
       rawString: raw,
       isTransversion: true,
       isHotspot,
-      weight: isHotspot ? 0.8 : 2.5
+      isNumtProne,
+      weight: isHotspot ? 0.8 : (isNumtProne ? 1.5 : 2.5)
     };
   }
 
@@ -81,6 +90,8 @@ export interface MtDnaMatchScore {
   totalMutations: number;
   matchedMutations: string[];
   transversionsMatched: number;
+  nonNumtMatchedCount: number;
+  pathConsistencyPct: number;
 }
 
 /**
@@ -96,6 +107,8 @@ export function matchPhyloTreeBuild17(
   for (const branch of branches) {
     let score = 0;
     let matchedCount = 0;
+    let ancestralClashCount = 0;
+    let nonNumtMatchedCount = 0;
     let transversionsMatched = 0;
     const matchedMutations: string[] = [];
 
@@ -111,25 +124,36 @@ export function matchPhyloTreeBuild17(
       const u = userAllele.toUpperCase();
       if (u.includes(parsed.derived)) {
         matchedCount++;
+        if (!parsed.isNumtProne) {
+          nonNumtMatchedCount++;
+        }
         score += parsed.weight;
         matchedMutations.push(rawMut);
         if (parsed.isTransversion) {
           transversionsMatched++;
         }
       } else if (u.includes(parsed.ancestral)) {
+        ancestralClashCount++;
         // Ancestral observation: slight negative pressure for deeply nested branches
         score -= parsed.isHotspot ? 0.2 : 0.6;
       }
     }
 
     if (matchedCount > 0) {
+      const totalObserved = matchedCount + ancestralClashCount;
+      const pathConsistencyPct = totalObserved > 0
+        ? Math.max(0, Math.round(((matchedCount - (ancestralClashCount * 0.5)) / totalObserved) * 100))
+        : 0;
+
       results.push({
         branchName: branch.branchName,
         score,
         matchedCount,
         totalMutations: branch.mutations.length,
         matchedMutations,
-        transversionsMatched
+        transversionsMatched,
+        nonNumtMatchedCount,
+        pathConsistencyPct
       });
     }
   }
@@ -151,22 +175,32 @@ export function refineMtdnaWithBuild17(
   const top = deepMatches[0];
   const currentCode = currentLineage.terminalHaplogroup.code;
 
-  // Check if the top deep match is a descendant or refinement of the current root clade
-  const isDescendant = top.branchName.startsWith(currentCode) || 
-                       (currentCode === 'N' && top.branchName.startsWith('W')) ||
-                       (currentCode === 'R' && (top.branchName.startsWith('H') || top.branchName.startsWith('V') || top.branchName.startsWith('U')));
+  // Broad descendant and macro-haplogroup relationship check
+  const isDescendant =
+    top.branchName.startsWith(currentCode) ||
+    (currentCode === 'L3' && (top.branchName.startsWith('M') || top.branchName.startsWith('N'))) ||
+    (currentCode === 'N' && (top.branchName.startsWith('R') || top.branchName.startsWith('A') || top.branchName.startsWith('I') || top.branchName.startsWith('W') || top.branchName.startsWith('X') || top.branchName.startsWith('Y'))) ||
+    (currentCode === 'R' && (top.branchName.startsWith('H') || top.branchName.startsWith('V') || top.branchName.startsWith('U') || top.branchName.startsWith('K') || top.branchName.startsWith('J') || top.branchName.startsWith('T') || top.branchName.startsWith('B') || top.branchName.startsWith('F'))) ||
+    (currentCode === 'HV' && (top.branchName.startsWith('H') || top.branchName.startsWith('V'))) ||
+    (currentCode === 'JT' && (top.branchName.startsWith('J') || top.branchName.startsWith('T'))) ||
+    (currentCode === 'U' && top.branchName.startsWith('K'));
 
-  if (isDescendant && top.score >= 1.5 && top.matchedCount >= 1) {
+  const coveragePct = Math.round((top.matchedCount / Math.max(1, top.totalMutations)) * 100);
+
+  // Guard: require at least one non-NUMT derived mutation and >= 40% path consistency
+  if (isDescendant && top.score >= 1.5 && top.matchedCount >= 1 && top.nonNumtMatchedCount >= 1 && top.pathConsistencyPct >= 40) {
     const existingNovel = currentLineage.novelOrUntestedMarkers || [];
     return {
       ...currentLineage,
       terminalHaplogroup: {
         ...currentLineage.terminalHaplogroup,
         code: top.branchName,
-        shortName: `Haplogroup ${top.branchName}`,
-        cladeName: `mtDNA-${top.branchName}`,
+        shortName: `mtDNA-${top.branchName}`,
+        cladeName: `PhyloTree-${top.branchName}`,
+        historicalDescription: `Deep maternal subclade confirmed via ${top.matchedCount} PhyloTree Build 17 mutations (${coveragePct}% coverage).`
       },
-      confidenceScore: Math.min(0.99, currentLineage.confidenceScore + 0.05),
+      confidenceScore: Math.min(99, Math.max(currentLineage.confidenceScore, Math.round(Math.min(99, 80 + top.score * 5)))),
+      coverage: coveragePct,
       novelOrUntestedMarkers: Array.from(new Set([...existingNovel, ...top.matchedMutations]))
     };
   }

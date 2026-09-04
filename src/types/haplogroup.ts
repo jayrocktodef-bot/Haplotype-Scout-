@@ -52,6 +52,45 @@ export interface HaplogroupDefinition {
   migrationPath: MigrationStep[];
 }
 
+export interface Phase2YDnaDetails {
+  terminalHaplogroup: string;
+  confidence: number;
+  coverage: number;
+  derivedSnpCount: number;
+  ancestralSnpCount: number;
+  nonPalindromicDerivedCount: number;
+  palindromicDerivedCount: number;
+  recurrentDerivedCount: number;
+  isPalindromicAmbiguous: boolean;
+  isProvisionalTerminal?: boolean;
+  apexAnchorClade?: string;
+  inferredBiologicalSex?: 'MALE' | 'FEMALE' | 'UNKNOWN';
+  path: string[];
+  rejectedBranches: string[];
+  derivedMarkers: {
+    name: string;
+    rsid?: string;
+    allele: string;
+    mutation?: string;
+    branch: string;
+    isPalindromic?: boolean;
+    isAmpliconic?: boolean;
+    isRecurrent?: boolean;
+    isChipNoiseProne?: boolean;
+  }[];
+  ancestralMarkers: {
+    name: string;
+    rsid?: string;
+    allele: string;
+    mutation?: string;
+    branch: string;
+    isPalindromic?: boolean;
+    isAmpliconic?: boolean;
+    isRecurrent?: boolean;
+    isChipNoiseProne?: boolean;
+  }[];
+}
+
 export interface LineageAnalysis {
   lineageType: LineageType;
   terminalHaplogroup: HaplogroupDefinition;
@@ -62,6 +101,9 @@ export interface LineageAnalysis {
   lineageTreePath: HaplogroupDefinition[]; // From root down to terminal
   evaluatedMarkers: EvaluatedMarker[];
   novelOrUntestedMarkers?: string[];
+  phase2Details?: Phase2YDnaDetails;
+  coverage?: number;
+  rejectedBranches?: string[];
 }
 
 export interface MicroHapResult {
@@ -98,6 +140,7 @@ export interface DnaAnalysisResult {
   kitName: string;
   timestamp: number;
   rawFileFormat: string;
+  detectedBuild?: 'GRCh37' | 'GRCh38' | 'UNKNOWN';
   totalSnpsParsed: number;
   yDnaSnpsCount: number;
   mtDnaSnpsCount: number;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { HaplogroupDefinition, EvaluatedMarker, LineageType } from '../types/haplogroup';
+import { HaplogroupDefinition, EvaluatedMarker, LineageType, Phase2YDnaDetails } from '../types/haplogroup';
 import { auditBranchSpineAndPrivateVariants, BranchAuditResult } from '../services/branchAuditEngine';
 import { getMitomapAnnotation } from '../services/mitomapEngine';
 import { loadHelixDatabase, getCachedHelixFrequency } from '../services/helixEngine';
 import { checkNumtRisk, getGnomadAncestryFrequencies } from '../services/gnomadMtdnaEngine';
 import { 
   GitCommit, CheckCircle2, XCircle, HelpCircle, AlertTriangle, 
-  ChevronDown, ChevronUp, Sparkles, Dna, ShieldCheck, ArrowDown
+  ChevronDown, ChevronUp, Sparkles, Dna, ShieldCheck, ArrowDown, ShieldAlert
 } from 'lucide-react';
 
 interface BranchSpineAuditCardProps {
@@ -14,13 +14,15 @@ interface BranchSpineAuditCardProps {
   evaluatedMarkers: EvaluatedMarker[];
   lineageType: LineageType;
   novelOrUntestedMarkers?: string[];
+  phase2Details?: Phase2YDnaDetails;
 }
 
 export const BranchSpineAuditCard: React.FC<BranchSpineAuditCardProps> = ({
   lineagePath,
   evaluatedMarkers,
   lineageType,
-  novelOrUntestedMarkers = []
+  novelOrUntestedMarkers = [],
+  phase2Details
 }) => {
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
   const [, setHelixLoaded] = useState(false);
@@ -300,6 +302,111 @@ export const BranchSpineAuditCard: React.FC<BranchSpineAuditCardProps> = ({
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Phase 2 ISOGG Traversal Audit Drawer */}
+      {phase2Details && phase2Details.derivedMarkers.length > 0 && (
+        <div className="p-5 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-indigo-400" />
+              <h4 className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+                ISOGG 2026 Phase 2 Tree Verification ({phase2Details.terminalHaplogroup})
+              </h4>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-mono">
+              <span className="px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-700/50">
+                Confidence: {phase2Details.confidence}%
+              </span>
+              <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">
+                Coverage: {phase2Details.coverage}%
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[11px] font-semibold text-slate-300">
+                Confirmed Derived Defining Markers ({phase2Details.derivedMarkers.length}):
+              </span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {phase2Details.isProvisionalTerminal && phase2Details.apexAnchorClade && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono flex items-center gap-1" title="Sparse array probe density. Confirmed anchor is upstream parent.">
+                    <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                    Apex Anchor: {phase2Details.apexAnchorClade}
+                  </span>
+                )}
+                {phase2Details.isPalindromicAmbiguous && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                    Palindromic Ambiguity Guard Active
+                  </span>
+                )}
+                {phase2Details.inferredBiologicalSex === 'FEMALE' && (
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-mono flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 text-rose-400" />
+                    Genomic Sex: Female Profile (&lt;30 Y calls)
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {phase2Details.derivedMarkers.map((m) => (
+                <div
+                  key={m.name}
+                  className="px-2.5 py-1 rounded-lg bg-slate-950 border border-indigo-500/40 text-xs font-mono flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span className="font-bold text-white">{m.name}</span>
+                  <span className="text-[10px] text-slate-400">({m.allele})</span>
+                  <span className="text-[9px] px-1 rounded bg-indigo-900/60 text-indigo-300">{m.branch}</span>
+                  {m.isPalindromic && (
+                    <span className="text-[9px] px-1 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40" title="Palindromic mutation (A/T or C/G) - susceptible to unstranded array flip">
+                      Palindromic
+                    </span>
+                  )}
+                  {m.isAmpliconic && (
+                    <span className="text-[9px] px-1 rounded bg-cyan-950/60 text-cyan-300 border border-cyan-800/40" title="Resides in Y ampliconic / AZF structural variation region">
+                      Ampliconic
+                    </span>
+                  )}
+                  {m.isRecurrent && (
+                    <span className="text-[9px] px-1 rounded bg-purple-950/60 text-purple-300 border border-purple-800/40" title="Recurrent homoplasy (parallel mutation across disjoint clades)">
+                      Homoplasic
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {phase2Details.rejectedBranches.length > 0 && (
+            <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+              <span className="text-[11px] font-semibold text-rose-300 flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                Ancestral Pruned Sibling Branches ({phase2Details.rejectedBranches.length}):
+              </span>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                These alternative branches were strictly pruned because the sample carries the ancestral (unmutated) allele at their defining loci:
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {phase2Details.rejectedBranches.slice(0, 15).map((b) => (
+                  <span
+                    key={b}
+                    className="px-2 py-0.5 rounded bg-rose-950/40 border border-rose-800/40 text-rose-300 font-mono text-[10px]"
+                  >
+                    {b} (rejected)
+                  </span>
+                ))}
+                {phase2Details.rejectedBranches.length > 15 && (
+                  <span className="text-[10px] text-slate-500 self-center">
+                    +{phase2Details.rejectedBranches.length - 15} more
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

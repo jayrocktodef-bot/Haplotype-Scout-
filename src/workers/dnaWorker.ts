@@ -1,6 +1,5 @@
-import { parseRawDnaText, ParsedDnaData } from '../services/dnaParser';
+import { parseRawDnaText, ParsedDnaData, decompressGenomicBuffer } from '../services/dnaParser';
 import { HaplogroupClassifier } from '../services/haplogroupClassifier';
-import { unzipSync } from 'fflate';
 
 export interface WorkerMessageRequest {
   type: 'PARSE_FILE' | 'PARSE_TEXT';
@@ -27,37 +26,22 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
     if (type === 'PARSE_TEXT' && text) {
       rawText = text;
     } else if (file) {
-      const name = (fileName || '').toLowerCase();
+      self.postMessage({ type: 'PROGRESS', progress: 10, message: 'Decompressing & inspecting raw genomic buffer...' });
+      const arrayBuffer = await file.arrayBuffer();
+      const rawBytes = new Uint8Array(arrayBuffer);
+      const decompressedBytes = decompressGenomicBuffer(rawBytes);
+      const decoder = new TextDecoder('utf-8');
+      rawText = decoder.decode(decompressedBytes);
 
-      if (name.endsWith('.zip')) {
-        self.postMessage({ type: 'PROGRESS', progress: 10, message: 'Decompressing ZIP archive...' });
-        const arrayBuffer = await file.arrayBuffer();
-        const unzipped = unzipSync(new Uint8Array(arrayBuffer));
-        
-        let textCandidate = '';
-        for (const [entryName, fileBytes] of Object.entries(unzipped)) {
-          const lowerEntry = entryName.toLowerCase();
-          if (lowerEntry.endsWith('.txt') || lowerEntry.endsWith('.csv') || lowerEntry.endsWith('.tsv') || lowerEntry.endsWith('.vcf')) {
-            const decoder = new TextDecoder('utf-8');
-            textCandidate = decoder.decode(fileBytes);
-            break;
-          }
-        }
-
-        if (!textCandidate) {
-          throw new Error('No compatible DNA text file found inside the ZIP archive.');
-        }
-        rawText = textCandidate;
-      } else {
-        self.postMessage({ type: 'PROGRESS', progress: 15, message: 'Reading raw data stream...' });
-        rawText = await file.text();
+      if (!rawText || rawText.trim().length === 0) {
+        throw new Error('Decompressed genetic file is empty or unsupported.');
       }
     }
 
-    self.postMessage({ type: 'PROGRESS', progress: 40, message: 'Parsing genomic loci & chromosomes...' });
+    self.postMessage({ type: 'PROGRESS', progress: 35, message: 'Parsing genomic loci & chromosomes...' });
 
     const parsedData: ParsedDnaData = parseRawDnaText(rawText, (linesProcessed) => {
-      const progress = Math.min(85, Math.round(40 + (linesProcessed / 700000) * 45));
+      const progress = Math.min(75, Math.round(35 + (linesProcessed / 700000) * 40));
       self.postMessage({
         type: 'PROGRESS',
         progress,
@@ -65,12 +49,66 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       });
     });
 
-    self.postMessage({ type: 'PROGRESS', progress: 85, message: 'Evaluating Y-DNA & mtDNA phylogenies...' });
+    self.postMessage({ type: 'PROGRESS', progress: 80, message: 'Evaluating Y-DNA & mtDNA phylogenies...' });
 
     const result = HaplogroupClassifier.analyze(kitName, parsedData);
+    result.detectedBuild = parsedData.build;
 
-    // 1. Deep mtDNA Evaluation via Van Oven PhyloTree Build 17
+    // 1. Phase 2 Deep Y-DNA ISOGG Tree Resolution
+    if (result.paternalLineage && result.isMaleSample) {
+      try {
+        self.postMessage({ type: 'PROGRESS', progress: 85, message: 'Resolving deep ISOGG Y-DNA subclades (Phase 2)...' });
+        const yResponse = await fetch('/data/y_phylotree.json');
+        if (yResponse.ok) {
+          const yPhyloDataset = await yResponse.json();
+          const { YDnaPredictorV2 } = await import('../services/yDnaPredictorV2');
+          const predictor = new YDnaPredictorV2(yPhyloDataset);
+          const phase2 = predictor.predict({
+            snpByRsid: parsedData.snpByRsid,
+            snpByPosition: parsedData.snpByPosition
+          });
+
+          if (phase2.terminalHaplogroup && phase2.terminalHaplogroup !== 'N/A' && phase2.terminalHaplogroup !== 'A') {
+            phase2.inferredBiologicalSex = parsedData.inferredBiologicalSex;
+            result.paternalLineage.phase2Details = phase2;
+            result.paternalLineage.confidenceScore = Math.max(result.paternalLineage.confidenceScore, Math.round(phase2.confidence));
+            result.paternalLineage.coverage = phase2.coverage;
+            result.paternalLineage.rejectedBranches = phase2.rejectedBranches;
+
+            const currentCode = result.paternalLineage.terminalHaplogroup.code;
+            const isSubclade = phase2.terminalHaplogroup.startsWith(currentCode) ||
+                               phase2.terminalHaplogroup.length > currentCode.length ||
+                               currentCode === 'A' || currentCode === 'CT';
+
+            if (isSubclade && phase2.derivedSnpCount > 0) {
+              const palindromicNote = phase2.isPalindromicAmbiguous
+                ? ` [Flagged: Terminal branch supported solely by palindromic A/T or C/G probes]`
+                : '';
+              const apexNote = phase2.isProvisionalTerminal && phase2.apexAnchorClade
+                ? ` [Sparse Array Density: Provisional sub-clade; verified anchor: ${phase2.apexAnchorClade}]`
+                : '';
+              const sexNote = parsedData.inferredBiologicalSex === 'FEMALE'
+                ? ` [Genomic Sex Notice: Sample exhibits female profile with <30 Y-chromosome calls; trace Y markers may represent cross-hybridization]`
+                : '';
+
+              result.paternalLineage.terminalHaplogroup = {
+                ...result.paternalLineage.terminalHaplogroup,
+                code: phase2.terminalHaplogroup,
+                shortName: `Y-${phase2.terminalHaplogroup}`,
+                cladeName: `ISOGG-${phase2.terminalHaplogroup}`,
+                historicalDescription: `Deep terminal subclade confirmed via ${phase2.derivedSnpCount} derived ISOGG defining markers (${phase2.confidence}% confidence, ${phase2.coverage}% coverage).${palindromicNote}${apexNote}${sexNote}`
+              };
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Deep Y-DNA Phase 2 resolution skipped:', e);
+      }
+    }
+
+    // 2. Deep mtDNA Evaluation via Van Oven PhyloTree Build 17
     try {
+      self.postMessage({ type: 'PROGRESS', progress: 90, message: 'Auditing maternal PhyloTree Build 17 spine...' });
       const mtResponse = await fetch('/data/master_mtdna.json');
       if (mtResponse.ok) {
         const mtData = await mtResponse.json();
@@ -98,7 +136,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       console.warn('Deep mtDNA Build 17 resolution skipped:', e);
     }
 
-    // 2. Microhaplotype Deconvolution (if microhap kernel is present)
+    // 3. Microhaplotype Deconvolution (if microhap kernel is present)
     try {
       const response = await fetch('/data/microhap_kernel.json');
       if (response.ok) {
@@ -110,7 +148,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       console.warn('Microhaplotype resolution skipped:', e);
     }
 
-    // 3. Archaic DNA Introgression & Hominin Affinity Deconvolution
+    // 4. Archaic DNA Introgression & Hominin Affinity Deconvolution
     try {
       const { calculateArchaicAffinity } = await import('../services/archaicEngine');
       result.archaicAffinity = calculateArchaicAffinity(
