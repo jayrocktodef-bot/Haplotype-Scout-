@@ -138,15 +138,17 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
     });
 
     it('evaluates single-letter IUPAC at a derived position to POSITIVE_DERIVED with isHeteroplasmic: true', () => {
-      // rs2853499 (2706G) is defining for H (ancestral A, derived G)
+      // rs2853499 (2706G) is defining for H (ancestral A, derived G, chrMT:2706)
       const chip = createRealisticBackgroundChip({
         'rs2853499': 'R' // R expands to AG, containing derived G
       });
 
       const evaluated = HaplogroupClassifier.evaluateMarkersWithLD(chip);
-      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499');
+      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499' && m.snp.position === 2706);
 
       expect(hMarker).toBeDefined();
+      expect(hMarker?.snp.haplogroup).toBe('H');
+      expect(hMarker?.snp.name).toBe('2706G');
       expect(hMarker?.status).toBe('POSITIVE_DERIVED');
       expect(hMarker?.isHeteroplasmic).toBe(true);
     });
@@ -157,9 +159,11 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
       });
 
       const evaluated = HaplogroupClassifier.evaluateMarkersWithLD(chip);
-      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499');
+      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499' && m.snp.position === 2706);
 
       expect(hMarker).toBeDefined();
+      expect(hMarker?.snp.haplogroup).toBe('H');
+      expect(hMarker?.snp.name).toBe('2706G');
       expect(hMarker?.status).toBe('POSITIVE_DERIVED');
       expect(hMarker?.isHeteroplasmic).toBe(true);
     });
@@ -170,9 +174,11 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
       });
 
       const evaluated = HaplogroupClassifier.evaluateMarkersWithLD(chip);
-      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499');
+      const hMarker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499' && m.snp.position === 2706);
 
       expect(hMarker).toBeDefined();
+      expect(hMarker?.snp.haplogroup).toBe('H');
+      expect(hMarker?.snp.name).toBe('2706G');
       expect(hMarker?.status).toBe('POSITIVE_DERIVED');
       expect(hMarker?.isHeteroplasmic).toBe(false);
     });
@@ -186,7 +192,7 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
         });
 
         const evaluated = HaplogroupClassifier.evaluateMarkersWithLD(chip);
-        const marker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499');
+        const marker = evaluated.find(m => m.snp.rsid.toLowerCase() === 'rs2853499' && m.snp.position === 2706);
 
         expect(marker?.status).toBe('NO_CALL');
         expect(marker?.isHeteroplasmic).toBe(false);
@@ -615,4 +621,30 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
     });
   });
 
+  // =========================================================================
+  // PERMANENT INVARIANT — Unique rsIDs in snpDatabase.ts
+  // =========================================================================
+  describe('Database Invariant: No duplicate rsIDs in snpDatabase', () => {
+    it('asserts that every rsid in ALL_DEFINING_SNPS appears exactly once (fail loudly on duplicate)', () => {
+      const seenRsids = new Map<string, string[]>();
+
+      for (const snp of ALL_DEFINING_SNPS) {
+        const key = snp.rsid.toLowerCase();
+        const existing = seenRsids.get(key) || [];
+        existing.push(`${snp.name} (${snp.haplogroup}, chr${snp.chromosome}:${snp.position})`);
+        seenRsids.set(key, existing);
+      }
+
+      const duplicates: string[] = [];
+      for (const [rsid, markers] of seenRsids.entries()) {
+        if (markers.length > 1) {
+          duplicates.push(`Duplicate rsID '${rsid}' found on markers: ${markers.join(' vs ')}`);
+        }
+      }
+
+      expect(duplicates, `Found duplicated rsIDs in snpDatabase.ts:\n${duplicates.join('\n')}`).toEqual([]);
+    });
+  });
+
 });
+
