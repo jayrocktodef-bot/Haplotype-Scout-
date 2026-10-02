@@ -20,7 +20,9 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
   onReset,
   onExploreTree
 }) => {
-  const [activeLineage, setActiveLineage] = useState<LineageType>('PATERNAL_YDNA');
+  const [activeLineage, setActiveLineage] = useState<LineageType>(
+    result.paternalLineage ? 'PATERNAL_YDNA' : 'MATERNAL_MTDNA'
+  );
   const [markerSearch, setMarkerSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'POSITIVE' | 'NEGATIVE' | 'NO_CALL' | 'IMPUTED'>('ALL');
 
@@ -117,9 +119,13 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
           >
             <Dna className="w-3.5 h-3.5" />
             <span>Paternal (Y-DNA)</span>
-            {result.paternalLineage && (
+            {result.paternalLineage ? (
               <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded bg-slate-950/60 font-mono font-bold">
                 {result.paternalLineage.terminalHaplogroup.code}
+              </span>
+            ) : (
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded bg-slate-950/60 font-mono font-bold text-slate-400">
+                Undetermined
               </span>
             )}
           </button>
@@ -134,9 +140,13 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Maternal (mtDNA)</span>
-            {result.maternalLineage && (
+            {result.maternalLineage ? (
               <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded bg-slate-950/60 font-mono font-bold">
                 {result.maternalLineage.terminalHaplogroup.code}
+              </span>
+            ) : (
+              <span className="ml-1 px-1.5 py-0.2 text-[10px] rounded bg-slate-950/60 font-mono font-bold text-slate-400">
+                Undetermined
               </span>
             )}
           </button>
@@ -159,6 +169,11 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 border border-emerald-700/50 text-emerald-400">
                     {currentAnalysis.confidenceScore}% Confidence (DAG Verified)
                   </span>
+                  {currentAnalysis.imputedPositiveCount !== undefined && currentAnalysis.imputedPositiveCount > 0 && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-950/80 border border-indigo-700/50 text-indigo-300">
+                      {currentAnalysis.imputedPositiveCount} supporting marker{currentAnalysis.imputedPositiveCount > 1 ? 's' : ''} imputed via LD proxies
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-baseline gap-3">
@@ -563,6 +578,11 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
                               LD Imputed
                             </span>
                           )}
+                          {m.isHeteroplasmic && (
+                            <span className="px-1.5 py-0.2 text-[10px] rounded bg-purple-950/80 border border-purple-700/60 text-purple-300 font-semibold">
+                              Heteroplasmic
+                            </span>
+                          )}
                           {(m.mutationWeight || 1.0) > 2.0 && (
                             <span className="px-1.5 py-0.2 text-[10px] rounded bg-amber-950/80 border border-amber-700/60 text-amber-300 font-semibold">
                               Transversion (4.5x)
@@ -595,10 +615,20 @@ export const AnalysisResultScreen: React.FC<AnalysisResultScreenProps> = ({
 
         </div>
       ) : (
-        <div className="bento-card p-12 text-center space-y-3">
-          <p className="text-sm text-slate-400">
-            No diagnostic markers available for this lineage type in the uploaded raw DNA file.
-          </p>
+        <div className="bento-card p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+            <HelpCircle className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-white">
+              {activeLineage === 'MATERNAL_MTDNA' ? 'Maternal Haplogroup Undetermined' : 'Paternal Haplogroup Undetermined'}
+            </h3>
+            <p className="text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
+              {activeLineage === 'MATERNAL_MTDNA'
+                ? 'Maternal haplogroup undetermined — too few informative markers in this file to place a haplogroup. A denser test (more mtDNA positions) would resolve it.'
+                : 'Paternal haplogroup undetermined — too few informative markers in this file to place a haplogroup. A denser test (more Y-DNA positions) would resolve it.'}
+            </p>
+          </div>
         </div>
       )}
 

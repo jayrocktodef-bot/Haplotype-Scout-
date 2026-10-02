@@ -12,9 +12,23 @@ import {
   MarkerStatus
 } from '../types/haplogroup';
 
+// IUPAC heteroplasmy codes for mixture positions in full-sequence files.
+// Excludes 'D' (deletion call — handled by the DEL branch) and 'N'
+// (no-call — must never match).
+export const IUPAC_HETEROZYGOTES: Record<string, string> = {
+  R: 'AG', Y: 'CT', S: 'GC', W: 'AT', K: 'GT', M: 'AC',
+  B: 'CGT', H: 'ACT', V: 'ACG',
+};
+
+export function expandIupacHeteroplasmy(genotype: string): string {
+  const u = genotype.toUpperCase();
+  return IUPAC_HETEROZYGOTES[u] ?? u;
+}
+
 interface HaploScore {
   haplogroup: HaplogroupDefinition;
   positives: number;
+  imputedPositives: number;
   weightedScore: number;
   negatives: number;
   totalMarkers: number;
@@ -52,7 +66,7 @@ export class HaplogroupClassifier {
     };
   }
 
-  private static evaluateMarkersWithLD(parsedData: ParsedDnaData): EvaluatedMarker[] {
+  public static evaluateMarkersWithLD(parsedData: ParsedDnaData): EvaluatedMarker[] {
     const result: EvaluatedMarker[] = [];
 
     for (const snp of ALL_DEFINING_SNPS) {
@@ -109,7 +123,7 @@ export class HaplogroupClassifier {
       // Calculate mutation weight: Transversions (A<->C, G<->T) get 5x weight; Transitions (A<->G, C<->T) get 1x
       const mutationWeight = this.getMutationWeight(snp.ancestralAllele, snp.derivedAllele);
 
-      if (userGenotype === '--' || !userGenotype) {
+      if (!userGenotype || userGenotype === '--' || userGenotype === 'N' || userGenotype === 'NN' || userGenotype === '00' || userGenotype === '??') {
         status = 'NO_CALL';
         details = 'Marker uncalled or not covered in raw data.';
       } else if (this.isGenotypeMatching(userGenotype, snp.derivedAllele)) {
@@ -127,6 +141,10 @@ export class HaplogroupClassifier {
         details = `Genotype '${userGenotype}' differs from expected ancestral (${snp.ancestralAllele}) & derived (${snp.derivedAllele}).`;
       }
 
+      const u = userGenotype.toUpperCase();
+      const isMixture = IUPAC_HETEROZYGOTES[u] !== undefined || (/^[ACGT]{2}$/.test(u) && u[0] !== u[1]);
+      const isHeteroplasmic = status === 'POSITIVE_DERIVED' && isMixture;
+
       result.push({
         snp,
         userGenotype,
@@ -134,6 +152,7 @@ export class HaplogroupClassifier {
         details,
         isImputed,
         imputedFrom,
+        isHeteroplasmic,
         mutationWeight
       });
     }
@@ -154,17 +173,20 @@ export class HaplogroupClassifier {
     return 4.5;
   }
 
-  private static isGenotypeMatching(userGenotype: string, targetAllele: string): boolean {
+  public static isGenotypeMatching(userGenotype: string, targetAllele: string): boolean {
     const u = userGenotype.toUpperCase();
     const t = targetAllele.toUpperCase();
 
     if (t === 'INS' || t === 'I') return u.includes('I') || u.includes('INS');
     if (t === 'DEL' || t === 'D') return u.includes('D') || u.includes('DEL');
 
-    return u.includes(t);
+    // Heteroplasmy: a mixed position carrying the target base counts as a match.
+    // 'D' and 'N' are absent from the map above, so deletion calls and no-calls
+    // can never match through expansion.
+    return expandIupacHeteroplasmy(u).includes(t);
   }
 
-  private static classifyLineage(type: LineageType, markers: EvaluatedMarker[]): LineageAnalysis {
+  public static classifyLineage(type: LineageType, markers: EvaluatedMarker[]): LineageAnalysis | null {
     const haplogroups = type === 'PATERNAL_YDNA' ? Y_DNA_HAPLOGROUPS : MT_DNA_HAPLOGROUPS;
 
     // Check ancestral status of major root clades to guard against false descendant matching
@@ -186,12 +208,16 @@ export class HaplogroupClassifier {
       );
 
       const positives = haploMarkers.filter(m => m.status === 'POSITIVE_DERIVED').length;
+      const imputedPositives = haploMarkers.filter(m => m.status === 'POSITIVE_DERIVED' && m.isImputed).length;
       const negatives = haploMarkers.filter(m => m.status === 'NEGATIVE_ANCESTRAL').length;
 
-      // Calculate weighted mutational support
+      // Calculate weighted mutational support: imputed markers contribute half their mutationWeight
       const weightedScore = haploMarkers
         .filter(m => m.status === 'POSITIVE_DERIVED')
-        .reduce((sum, m) => sum + (m.mutationWeight || 1.0), 0);
+        .reduce((sum, m) => {
+          const w = m.mutationWeight || 1.0;
+          return sum + (m.isImputed ? w * 0.5 : w);
+        }, 0);
 
       // Check if any ancestor on the path was definitively negative (Ancestral Guard)
       const path = this.buildLineagePath(haplo, haplogroups);
@@ -200,6 +226,7 @@ export class HaplogroupClassifier {
       return {
         haplogroup: haplo,
         positives,
+        imputedPositives,
         weightedScore,
         negatives,
         totalMarkers: haploMarkers.length,
@@ -217,32 +244,46 @@ export class HaplogroupClassifier {
       return a.negatives - b.negatives;
     });
 
-    const bestCandidate = validCandidates[0] || scoredHaplos.filter(h => h.positives > 0)[0] || scoredHaplos[0] || {
-      haplogroup: haplogroups[0],
-      positives: 0,
-      weightedScore: 0,
-      negatives: 0,
-      totalMarkers: 0,
-      depth: 1,
-      hasAncestralConflict: false
-    };
+    // A call with no positive, non-conflicted evidence is not a call.
+    const bestCandidate = validCandidates[0] || null;
+    if (!bestCandidate) {
+      return null;
+    }
 
     const treePath = this.buildLineagePath(bestCandidate.haplogroup, haplogroups);
 
     const totalPos = markers.filter(m => m.status === 'POSITIVE_DERIVED').length;
     const totalNeg = markers.filter(m => m.status === 'NEGATIVE_ANCESTRAL').length;
 
-    let confidence = 30;
-    if (bestCandidate.positives > 0) {
-      const baseConfidence = bestCandidate.positives >= 3 ? 99 : (bestCandidate.positives === 2 ? 96 : 90);
-      confidence = Math.max(50, Math.min(99, baseConfidence - (bestCandidate.negatives * 8)));
+    // Confidence ladder uses effective positives = observed positives + 0.5 * imputed positives
+    // Starting thresholds:
+    // effective >= 3 -> 99
+    // effective >= 2 -> 96
+    // effective >= 1 -> 80 (down from 90: a single supporting marker, however observed, should not claim 90%)
+    // 0 < effective < 1 -> 65 (single imputed proxy with no direct observation)
+    // minus 8 per negative as today, floor 50.
+    const observedPositives = bestCandidate.positives - bestCandidate.imputedPositives;
+    const effectivePositives = observedPositives + 0.5 * bestCandidate.imputedPositives;
+
+    let baseConfidence = 50;
+    if (effectivePositives >= 3) {
+      baseConfidence = 99;
+    } else if (effectivePositives >= 2) {
+      baseConfidence = 96;
+    } else if (effectivePositives >= 1) {
+      baseConfidence = 80;
+    } else if (effectivePositives > 0) {
+      baseConfidence = 65;
     }
+
+    const confidence = Math.max(50, Math.min(99, baseConfidence - (bestCandidate.negatives * 8)));
 
     return {
       lineageType: type,
       terminalHaplogroup: bestCandidate.haplogroup,
       confidenceScore: confidence,
       positiveCount: totalPos,
+      imputedPositiveCount: bestCandidate.imputedPositives,
       negativeCount: totalNeg,
       totalTestedMarkers: markers.length,
       lineageTreePath: treePath,

@@ -25,6 +25,7 @@ export interface EvaluatedMarker {
   details: string;
   isImputed?: boolean;
   imputedFrom?: string;
+  isHeteroplasmic?: boolean;  // true when the positive call came from a mixed position
   mutationWeight?: number;  // Higher for rare transversions (e.g. 5x vs 1x transitions)
 }
 
@@ -96,6 +97,7 @@ export interface LineageAnalysis {
   terminalHaplogroup: HaplogroupDefinition;
   confidenceScore: number;      // 0 - 100%
   positiveCount: number;
+  imputedPositiveCount?: number;
   negativeCount: number;
   totalTestedMarkers: number;
   lineageTreePath: HaplogroupDefinition[]; // From root down to terminal

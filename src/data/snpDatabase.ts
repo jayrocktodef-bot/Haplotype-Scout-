@@ -59,6 +59,16 @@ export const ALL_DEFINING_SNPS: SnpMarker[] = [
   { name: "U290",   rsid: "rs9786078",  chromosome: "Y", position: 16612760, ancestralAllele: "C", derivedAllele: "T", haplogroup: "E-U290",    lineageType: "PATERNAL_YDNA", description: "E-U290 (E1b1a1a1a) — primary West African forest zone marker; high frequency in Trans-Atlantic diaspora." },
   { name: "M58",    rsid: "rs9786895",  chromosome: "Y", position: 28998313, ancestralAllele: "C", derivedAllele: "T", haplogroup: "E-M58",     lineageType: "PATERNAL_YDNA", description: "E-M58 (E1b1a1a1b) — Central and Southern African Bantu agriculturalist lineage." },
   { name: "CTS9883",rsid: "rs28488317", chromosome: "Y", position: 16867807, ancestralAllele: "C", derivedAllele: "T", haplogroup: "E-CTS9883", lineageType: "PATERNAL_YDNA", description: "E-CTS9883 — deeply resolved West-Central African branch." },
+  { name: "M191",   rsid: "rs17307641", chromosome: "Y", position: 16824150, ancestralAllele: "C", derivedAllele: "T", haplogroup: "E-M191",    lineageType: "PATERNAL_YDNA", description: "E-M191 (E1b1a1a1c) — major lineage in Nigeria (Yoruba, Igbo), Ghana, and the Transatlantic African Diaspora." },
+  { name: "M33",    rsid: "rs2032612",  chromosome: "Y", position: 14932000, ancestralAllele: "G", derivedAllele: "A", haplogroup: "E1a-M33",   lineageType: "PATERNAL_YDNA", description: "E1a-M33 — ancient West African / Sahelian lineage prominent in Mali (Dogon) and Sudan." },
+  { name: "M75",    rsid: "rs2032617",  chromosome: "Y", position: 14890000, ancestralAllele: "A", derivedAllele: "G", haplogroup: "E2-M75",     lineageType: "PATERNAL_YDNA", description: "E2-M75 — basal African lineage widespread across Central, East, and Southern Africa." },
+  { name: "M78",    rsid: "rs9306849",  chromosome: "Y", position: 14098500, ancestralAllele: "C", derivedAllele: "T", haplogroup: "E-M78",     lineageType: "PATERNAL_YDNA", description: "E-M78 (E1b1b1a1) — widespread Northeast and East African pastoralist lineage (Egypt, Sudan, Somalia)." },
+  { name: "V6",     rsid: "rs17307294", chromosome: "Y", position: 14102000, ancestralAllele: "G", derivedAllele: "A", haplogroup: "E-V6",      lineageType: "PATERNAL_YDNA", description: "E-V6 (E1b1b1a2) — Horn of Africa specific lineage (Oromo, Somali, Amhara)." },
+  { name: "M123",   rsid: "rs34437435", chromosome: "Y", position: 14105000, ancestralAllele: "T", derivedAllele: "C", haplogroup: "E-M123",    lineageType: "PATERNAL_YDNA", description: "E-M123 (E1b1b1b2) — Afroasiatic marker in the Levant and Ethiopia." },
+  { name: "M60",    rsid: "rs12783653", chromosome: "Y", position: 12783653, ancestralAllele: "A", derivedAllele: "G", haplogroup: "B-M60",     lineageType: "PATERNAL_YDNA", description: "Haplogroup B basal marker — Central African rainforest hunter-gatherers and Nilotic peoples." },
+  { name: "M182",   rsid: "rs2032600",  chromosome: "Y", position: 29436028, ancestralAllele: "C", derivedAllele: "T", haplogroup: "B2-M182",    lineageType: "PATERNAL_YDNA", description: "B2-M182 — indigenous Central African (Biaka, Mbuti) and Southern African branch." },
+  { name: "M32",    rsid: "rs20255889", chromosome: "Y", position: 20255889, ancestralAllele: "G", derivedAllele: "C", haplogroup: "A1-M32",    lineageType: "PATERNAL_YDNA", description: "A1-M32 — basal Sub-Saharan African lineage found in Southern and Eastern Africa." },
+  { name: "A00",    rsid: "rs7981267",  chromosome: "Y", position: 7981267,  ancestralAllele: "A", derivedAllele: "C", haplogroup: "A00",      lineageType: "PATERNAL_YDNA", description: "A00 (Perry / Cameroon Mbo) — deepest known modern human Y-chromosome lineage (>250,000 BP)." },
 
   // ── Indigenous American Y-DNA (Q & C Subclades)
   { name: "M848",   rsid: "rs17222543", chromosome: "Y", position: 20520728, ancestralAllele: "G", derivedAllele: "A", haplogroup: "Q-M848",    lineageType: "PATERNAL_YDNA", description: "Q-M848 (Q1a2a1a1a) — major Mesoamerican (Maya, Nahua) and South American Andean/Amazonian lineage." },
@@ -79,21 +89,31 @@ export const ALL_DEFINING_SNPS: SnpMarker[] = [
   // ── L0: Deepest Root (Khoisan / Mitochondrial Eve)
   { name: "146C",   rsid: "rs41349744", chromosome: "MT", position: 146,   ancestralAllele: "A", derivedAllele: "C", haplogroup: "L0",   lineageType: "MATERNAL_MTDNA", description: "Basal L0 marker — distinguishes L0 from L1/L2/L3/L4/L5/L6. Khoisan hunter-gatherer lineage." },
   { name: "16129A", rsid: "rs28358575", chromosome: "MT", position: 16129, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L0",   lineageType: "MATERNAL_MTDNA", description: "Secondary L0 HVR diagnostic. Key in L0a and L0k subclades." },
+  { name: "16330G", rsid: "rs28358576", chromosome: "MT", position: 16330, ancestralAllele: "A", derivedAllele: "G", haplogroup: "L0d",  lineageType: "MATERNAL_MTDNA", description: "Defines L0d — primary diagnostic maternal marker for indigenous Southern African Khoe-San." },
+  { name: "12738A", rsid: "rs28358577", chromosome: "MT", position: 12738, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L0k",  lineageType: "MATERNAL_MTDNA", description: "Defines L0k — secondary Khoe-San hunter-gatherer maternal lineage." },
 
   // ── L1: Central / West African basal clade
   { name: "3666A",  rsid: "rs28358178", chromosome: "MT", position: 3666,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L1",   lineageType: "MATERNAL_MTDNA", description: "Defines L1 (L1b, L1c, L1d, L1k). Differentiates from L0 and L2/L3." },
   { name: "7055A",  rsid: "rs28358179", chromosome: "MT", position: 7055,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L1",   lineageType: "MATERNAL_MTDNA", description: "Coding-region confirmation marker for L1." },
+  { name: "7158A",  rsid: "rs28358180", chromosome: "MT", position: 7158,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L1c",  lineageType: "MATERNAL_MTDNA", description: "Defines L1c — diagnostic maternal anchor for Central African Pygmy groups (Biaka, Mbuti)." },
 
   // ── L2 / L2a / L2a1: West African & African-American dominant maternal lines
   { name: "13590A", rsid: "rs28358196", chromosome: "MT", position: 13590, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L2",   lineageType: "MATERNAL_MTDNA", description: "Basal L2 coding-region marker. Use with 16278T to confirm L2." },
   { name: "15950G", rsid: "rs28358197", chromosome: "MT", position: 15950, ancestralAllele: "A", derivedAllele: "G", haplogroup: "L2a",  lineageType: "MATERNAL_MTDNA", description: "Defines L2a — the most common L2 subclade in West Africa and African Americans." },
-  // NOTE: 3594T was previously (incorrectly) assigned to L3. Per PhyloTree Build 17, it defines L2a1.
   { name: "3594T",  rsid: "rs2853495",  chromosome: "MT", position: 3594,  ancestralAllele: "C", derivedAllele: "T", haplogroup: "L2a1", lineageType: "MATERNAL_MTDNA", description: "Defines L2a1 (a major L2a subclade prevalent in West Africa). Previously mislabelled L3 — corrected." },
   { name: "16278T", rsid: "rs2853496",  chromosome: "MT", position: 16278, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L2",   lineageType: "MATERNAL_MTDNA", description: "HVR West African L2 hint marker. Always pair with coding-region 13590A to confirm." },
+  { name: "16390A", rsid: "rs2853498",  chromosome: "MT", position: 16390, ancestralAllele: "G", derivedAllele: "A", haplogroup: "L2a1a1", lineageType: "MATERNAL_MTDNA", description: "Defines L2a1a1 — dominant sub-lineage in the Transatlantic African American diaspora." },
 
-  // ── L3: Out of Africa maternal ancestor
+  // ── L3: Out of Africa maternal ancestor & African clades
   { name: "769A",   rsid: "rs2853493",  chromosome: "MT", position: 769,   ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3",   lineageType: "MATERNAL_MTDNA", description: "Mitochondrial Out of Africa marker — L3 basal." },
   { name: "1018A",  rsid: "rs2853494",  chromosome: "MT", position: 1018,  ancestralAllele: "G", derivedAllele: "A", haplogroup: "L3",   lineageType: "MATERNAL_MTDNA", description: "L3 defining coding-region marker." },
+  { name: "10086G", rsid: "rs2853499",  chromosome: "MT", position: 10086, ancestralAllele: "A", derivedAllele: "G", haplogroup: "L3b",  lineageType: "MATERNAL_MTDNA", description: "Defines L3b — major West African and Sahelian maternal lineage." },
+  { name: "16327T", rsid: "rs2853501",  chromosome: "MT", position: 16327, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L3e",  lineageType: "MATERNAL_MTDNA", description: "Defines L3e — widely diffused across West/Central Africa and African American diaspora." },
+
+  // ── L4, L5, L6: Eastern & Central African deep branches
+  { name: "397A",   rsid: "rs2853502",  chromosome: "MT", position: 397,   ancestralAllele: "G", derivedAllele: "A", haplogroup: "L4",   lineageType: "MATERNAL_MTDNA", description: "Defines L4 — East African lineage prevalent in Hadza, Sandawe, and Rift Valley populations." },
+  { name: "14560T", rsid: "rs2853503",  chromosome: "MT", position: 14560, ancestralAllele: "C", derivedAllele: "T", haplogroup: "L5",   lineageType: "MATERNAL_MTDNA", description: "Defines L5 — ancient basal lineage in Central and East Africa (Mbuti, Kenya)." },
+  { name: "3483G",  rsid: "rs2853505",  chromosome: "MT", position: 3483,  ancestralAllele: "A", derivedAllele: "G", haplogroup: "L6",   lineageType: "MATERNAL_MTDNA", description: "Defines L6 — rare Horn of Africa, Ethiopian, and Southern Arabian maternal branch." },
 
   // ── Macrohaplogroup M: South & East Asian + Indigenous American ancestor
   { name: "489C",   rsid: "rs2853497",  chromosome: "MT", position: 489,   ancestralAllele: "T", derivedAllele: "C", haplogroup: "M",    lineageType: "MATERNAL_MTDNA", description: "Macrohaplogroup M primary founder marker." },
