@@ -244,8 +244,10 @@ export class HaplogroupClassifier {
       return a.negatives - b.negatives;
     });
 
-    // A call with no positive, non-conflicted evidence is not a call.
-    const bestCandidate = validCandidates[0] || null;
+    // Lineage-Consistency Gate: Candidates must have at least one non-recurrent derived marker
+    // on their lineage path to guard against lateral wins on recurrent transversion weight alone.
+    const anchoredCandidates = validCandidates.filter(h => this.hasNonRecurrentPathSupport(h, haplogroups, markers));
+    const bestCandidate = anchoredCandidates[0] || null;
     if (!bestCandidate) {
       return null;
     }
@@ -289,6 +291,159 @@ export class HaplogroupClassifier {
       lineageTreePath: treePath,
       evaluatedMarkers: markers
     };
+  }
+
+  private static recurrentMarkersCache: Set<string> | null = null;
+
+  public static isMtHypervariableRegion(position: number): boolean {
+    // rCRS coordinates, standard forensic boundaries (inclusive):
+    // HVR1: 16024–16383, HVR2: 57–372, HVR3: 438–574
+    return (
+      (position >= 16024 && position <= 16383) ||
+      (position >= 57 && position <= 372) ||
+      (position >= 438 && position <= 574)
+    );
+  }
+
+  private static isAncestorOrSelf(
+    ancestorCandidateCode: string,
+    descendantCandidateCode: string,
+    tree: HaplogroupDefinition[]
+  ): boolean {
+    const target = ancestorCandidateCode.toLowerCase();
+    let currentCode: string | null = descendantCandidateCode.toLowerCase();
+
+    while (currentCode) {
+      if (currentCode === target) {
+        return true;
+      }
+      const node = tree.find(h => h.code.toLowerCase() === currentCode);
+      currentCode = node?.parentClade ? node.parentClade.toLowerCase() : null;
+    }
+    return false;
+  }
+
+  private static getRecurrentMarkers(): Set<string> {
+    if (this.recurrentMarkersCache) {
+      return this.recurrentMarkersCache;
+    }
+
+    const recurrent = new Set<string>();
+
+    interface MarkerGroup {
+      chromosome: string;
+      position: number;
+      lineageType: LineageType;
+      haplogroups: Set<string>;
+    }
+
+    const groups = new Map<string, MarkerGroup>();
+
+    for (const snp of ALL_DEFINING_SNPS) {
+      const key = `${snp.chromosome.toLowerCase()}:${snp.position}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          chromosome: snp.chromosome.toUpperCase(),
+          position: snp.position,
+          lineageType: snp.lineageType,
+          haplogroups: new Set<string>()
+        };
+        groups.set(key, group);
+      }
+      group.haplogroups.add(snp.haplogroup);
+    }
+
+    for (const [key, group] of groups.entries()) {
+      const isMt = group.chromosome === 'MT' || group.chromosome === 'M';
+      const isHvr = isMt && this.isMtHypervariableRegion(group.position);
+
+      let isRecurrentByB = false;
+      const haploList = Array.from(group.haplogroups);
+
+      if (haploList.length >= 2) {
+        const tree = group.lineageType === 'PATERNAL_YDNA' ? Y_DNA_HAPLOGROUPS : MT_DNA_HAPLOGROUPS;
+
+        for (let i = 0; i < haploList.length; i++) {
+          for (let j = i + 1; j < haploList.length; j++) {
+            const h1 = haploList[i];
+            const h2 = haploList[j];
+            const related =
+              this.isAncestorOrSelf(h1, h2, tree) ||
+              this.isAncestorOrSelf(h2, h1, tree);
+
+            if (!related) {
+              isRecurrentByB = true;
+              break;
+            }
+          }
+          if (isRecurrentByB) break;
+        }
+      }
+
+      if (isHvr || isRecurrentByB) {
+        recurrent.add(key);
+      }
+
+      if (isRecurrentByB && !isHvr) {
+        console.debug(
+          `[HaplogroupClassifier] Recurrent marker flagged by rule (b) only: ${key} (${haploList.join(', ')})`
+        );
+      }
+    }
+
+    this.recurrentMarkersCache = recurrent;
+    return recurrent;
+  }
+
+  public static isRecurrentMarker(
+    markerOrPos: number | string | { chromosome: string; position: number },
+    defaultChromosome: string = 'MT'
+  ): boolean {
+    let chr: string;
+    let pos: number;
+
+    if (typeof markerOrPos === 'number') {
+      chr = defaultChromosome;
+      pos = markerOrPos;
+    } else if (typeof markerOrPos === 'string') {
+      if (markerOrPos.includes(':')) {
+        const parts = markerOrPos.split(':');
+        chr = parts[0];
+        pos = parseInt(parts[1], 10);
+      } else {
+        chr = defaultChromosome;
+        pos = parseInt(markerOrPos, 10);
+      }
+    } else {
+      chr = markerOrPos.chromosome;
+      pos = markerOrPos.position;
+    }
+
+    const isMt = chr.toUpperCase() === 'MT' || chr.toUpperCase() === 'M';
+    if (isMt && this.isMtHypervariableRegion(pos)) {
+      return true;
+    }
+
+    const key = `${chr.toLowerCase()}:${pos}`;
+    return this.getRecurrentMarkers().has(key);
+  }
+
+  public static isRecurrent = HaplogroupClassifier.isRecurrentMarker;
+
+  private static hasNonRecurrentPathSupport(
+    candidate: HaploScore,
+    allHaplos: HaplogroupDefinition[],
+    markers: EvaluatedMarker[]
+  ): boolean {
+    const lineagePath = this.buildLineagePath(candidate.haplogroup, allHaplos);
+    const pathHaploCodes = new Set(lineagePath.map(h => h.code.toLowerCase()));
+
+    return markers.some(m =>
+      m.status === 'POSITIVE_DERIVED' &&
+      pathHaploCodes.has(m.snp.haplogroup.toLowerCase()) &&
+      !this.isRecurrentMarker(m.snp)
+    );
   }
 
   private static calculateCladeDepth(haplo: HaplogroupDefinition, allHaplos: HaplogroupDefinition[]): number {

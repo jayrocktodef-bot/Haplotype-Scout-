@@ -524,100 +524,96 @@ describe('HaplogroupClassifier — Evidence-Honesty Improvements', () => {
   });
 
   // =========================================================================
-  // INVESTIGATION ITEM — Can a recurrent marker crown a lateral branch?
+  // LINEAGE-CONSISTENCY GATE — Recurrent-Marker Lateral Win Protection
   // =========================================================================
-  describe('Investigation Item: Recurrent Marker Lateral Branch Vulnerability', () => {
-    it('demonstrates that a single recurrent marker can crown a lateral branch if upstream root markers are untested/no-call', () => {
-      /**
-       * Scenario:
-       * User is truly Haplogroup H (has direct derived marker 2706G, weight 1.0 transition).
-       * However, user also carries a private or recurrent transversion mutation (weight 4.5)
-       * that happens to match a defining transversion marker of a completely distant lateral clade
-       * (e.g., L1b marker or similar), but the intermediate/root markers of that lateral clade
-       * were NOT tested in the file (NO_CALL, so no negative ancestral call to trigger the ancestral conflict guard).
-       * 
-       * Scoring:
-       * True clade (H): 1 transition -> weightedScore = 1.0
-       * Lateral clade: 1 transversion -> weightedScore = 4.5
-       * 
-       * Sorting: b.weightedScore - a.weightedScore -> 4.5 > 1.0!
-       * Result: The lateral branch wins because max(weightedScore) picks it without a lineage-consistency check!
-       */
-      const mockTrueClade: HaplogroupDefinition = {
-        code: 'H-True',
-        shortName: 'H True',
-        cladeName: 'H-True',
-        lineageType: 'MATERNAL_MTDNA',
-        parentClade: null,
-        definingSnps: ['SNP_TRUE'],
-        ageYearsBp: '~20,000 BP',
-        originRegion: 'Europe',
-        historicalDescription: 'True maternal branch',
-        ancientCultures: [],
-        highFrequencyModern: [],
-        migrationPath: []
-      };
+  describe('Lineage-Consistency Gate: Recurrent-marker lateral win protection', () => {
+    it('(a) Recurrence units: validates recurrence classification on canonical markers', () => {
+      // 16390 -> true (L2a1a1 vs L2b, non-nested, rule b)
+      expect(HaplogroupClassifier.isRecurrentMarker(16390)).toBe(true);
+      // 2706 -> false (H only, rule b false, non-HVR)
+      expect(HaplogroupClassifier.isRecurrentMarker(2706)).toBe(false);
+      // 16311 -> true (D1a vs M nested, rule b false, but HVR1 -> rule a true)
+      expect(HaplogroupClassifier.isRecurrentMarker(16311)).toBe(true);
+      // 6776 -> false (H3 vs H3a nested, rule b false, non-HVR)
+      expect(HaplogroupClassifier.isRecurrentMarker(6776)).toBe(false);
+      // 146 -> true (HVR2 -> rule a true)
+      expect(HaplogroupClassifier.isRecurrentMarker(146)).toBe(true);
+    });
 
-      const mockLateralClade: HaplogroupDefinition = {
-        code: 'L-Lateral',
-        shortName: 'L Lateral',
-        cladeName: 'L-Lateral',
-        lineageType: 'MATERNAL_MTDNA',
-        parentClade: null,
-        definingSnps: ['SNP_RECURRENT'],
-        ageYearsBp: '~100,000 BP',
-        originRegion: 'Africa',
-        historicalDescription: 'Distant lateral branch',
-        ancientCultures: [],
-        highFrequencyModern: [],
-        migrationPath: []
-      };
+    it('(b) Gate integration: crowns H over L0 when L0 derived support is purely recurrent 146C (4.5 vs 1.0)', () => {
+      // Realistic background: dozens of markers from other maternal clades are ancestral,
+      // but upstream intermediate markers (HV, N, L3) are uncalled/untested on this chip.
+      const chip = createRealisticBackgroundChip({
+        'rs2853499': 'G',   // 2706G (H, transition 1.0)
+        'rs41349744': 'C',  // 146C (L0, transversion 4.5, HVR2)
+        'rs28358325': '--', // 14766C (HV root)
+        'rs2853491': '--',  // 8701G (N root)
+        'rs2853492': '--',  // 10398G (N root)
+        'rs28358321': '--', // 150C (N root)
+        'rs28358322': '--', // 10238C (N root)
+        'rs2853493': '--',  // 769A (L3 root)
+        'rs2853494': '--',  // 1018A (L3 root)
+        'rs28358575': '--', // 16129A (L0 secondary)
+        'rs28358576': '--', // 16330G (L0d)
+        'rs28358577': '--', // 12738A (L0k)
+      }, { includeY: false, includeMt: true });
 
-      const trueMarker: EvaluatedMarker = {
-        snp: {
-          name: 'SNP_TRUE',
-          rsid: 'rsTrue',
-          chromosome: 'MT',
-          position: 100,
-          ancestralAllele: 'A',
-          derivedAllele: 'G', // transition: weight 1.0
-          haplogroup: 'H',
-          lineageType: 'MATERNAL_MTDNA',
-          description: 'True branch transition'
-        },
-        userGenotype: 'G',
-        status: 'POSITIVE_DERIVED',
-        details: 'Observed true base',
-        mutationWeight: 1.0
-      };
+      const result = HaplogroupClassifier.analyze('Gate Integration Kit', chip);
 
-      const recurrentLateralMarker: EvaluatedMarker = {
-        snp: {
-          name: 'SNP_RECURRENT',
-          rsid: 'rsRecurrent',
-          chromosome: 'MT',
-          position: 200,
-          ancestralAllele: 'A',
-          derivedAllele: 'C', // transversion: weight 4.5
-          haplogroup: 'L1b',
-          lineageType: 'MATERNAL_MTDNA',
-          description: 'Recurrent transversion'
-        },
-        userGenotype: 'C',
-        status: 'POSITIVE_DERIVED',
-        details: 'Observed recurrent mutation',
-        mutationWeight: 4.5
-      };
+      expect(result.maternalLineage).not.toBeNull();
+      expect(result.maternalLineage?.terminalHaplogroup.code).toBe('H');
+    });
 
-      // When classified with all markers
-      const result = HaplogroupClassifier.classifyLineage('MATERNAL_MTDNA', [trueMarker, recurrentLateralMarker]);
+    it('(c) Only 146C derived: returns null lineage when sole derived support is recurrent', () => {
+      const chip = createRealisticBackgroundChip({
+        'rs41349744': 'C',  // 146C (L0, transversion 4.5, HVR2)
+      }, { includeY: false, includeMt: true });
 
-      // Findings:
-      // The lateral branch (L1b) scores 4.5 vs H which scores 1.0.
-      // Because L1b's root was not explicitly negative (it was untested),
-      // the lateral branch wins over the true branch solely due to the higher transversion weight!
-      expect(result).not.toBeNull();
-      expect(result?.terminalHaplogroup.code).toBe('L1b');
+      const result = HaplogroupClassifier.analyze('Only 146C Kit', chip);
+      expect(result.maternalLineage).toBeNull();
+    });
+
+    it('(d) Only 2706G derived: crowns H (gate inert)', () => {
+      const chip = createRealisticBackgroundChip({
+        'rs2853499': 'G',   // 2706G (H, transition 1.0)
+        'rs28358325': '--', // 14766C (HV root) uncalled
+        'rs2853491': '--',  // 8701G (N root) uncalled
+        'rs2853492': '--',  // 10398G (N root) uncalled
+        'rs28358321': '--', // 150C (N root) uncalled
+        'rs28358322': '--', // 10238C (N root) uncalled
+        'rs2853493': '--',  // 769A (L3 root) uncalled
+        'rs2853494': '--',  // 1018A (L3 root) uncalled
+        'rs41349744': '--', // 146C (L0 root) uncalled
+        'rs28358575': '--', // 16129A (L0 secondary)
+        'rs28358576': '--', // 16330G (L0d)
+        'rs28358577': '--', // 12738A (L0k)
+      }, { includeY: false, includeMt: true });
+
+      const result = HaplogroupClassifier.analyze('Only 2706G Kit', chip);
+      expect(result.maternalLineage).not.toBeNull();
+      expect(result.maternalLineage?.terminalHaplogroup.code).toBe('H');
+    });
+
+    it('(e) 146C + 2706G + another non-recurrent H-path derived marker crowns H (gate inert)', () => {
+      const chip = createRealisticBackgroundChip({
+        'rs2853499': 'G',   // 2706G (H, transition 1.0)
+        'rs28358280': 'C',  // 7028C (H diagnostic, transition 1.0, non-recurrent)
+        'rs41349744': 'C',  // 146C (L0, transversion 4.5, HVR2)
+        'rs28358325': '--', // 14766C (HV root)
+        'rs2853491': '--',  // 8701G (N root)
+        'rs2853492': '--',  // 10398G (N root)
+        'rs28358321': '--', // 150C (N root)
+        'rs28358322': '--', // 10238C (N root)
+        'rs2853493': '--',  // 769A (L3 root)
+        'rs2853494': '--',  // 1018A (L3 root)
+        'rs28358575': '--', // 16129A (L0 secondary)
+        'rs28358576': '--', // 16330G (L0d)
+        'rs28358577': '--', // 12738A (L0k)
+      }, { includeY: false, includeMt: true });
+
+      const result = HaplogroupClassifier.analyze('Multi-marker H Kit', chip);
+      expect(result.maternalLineage).not.toBeNull();
+      expect(result.maternalLineage?.terminalHaplogroup.code).toBe('H');
     });
   });
 
